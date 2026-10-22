@@ -2,6 +2,7 @@
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from player import Canvas, Film, width
@@ -13,13 +14,64 @@ class LayoutTests(unittest.TestCase):
         cls.film = Film()
 
     def test_running_hud_is_hidden_without_moving_scene_or_subtitles(self):
-        hidden = self.film.render(67.3, 128, 44, hud_visible=False)
-        shown = self.film.render(67.3, 128, 44, hud_visible=True)
-        self.assertNotIn('SPACE play/pause', hidden.plain())
-        self.assertIn('SPACE play/pause', shown.plain())
-        self.assertIn('If I can make you happy', hidden.plain())
-        self.assertEqual(hidden.cells[4:38], shown.cells[4:38])
-        self.assertEqual(hidden.cells[39:43], shown.cells[39:43])
+        for w,h in ((64,24),(80,30),(120,30),(128,44),(180,55)):
+            with self.subTest(size=(w,h)):
+                hidden = self.film.render(67.3,w,h,hud_visible=False)
+                shown = self.film.render(67.3,w,h,hud_visible=True)
+                self.assertNotIn('SPACE play/pause', hidden.plain())
+                self.assertIn('SPACE play/pause', ''.join(ch for ch,_ in shown.cells[2]))
+                self.assertEqual(hidden.cells[3:], shown.cells[3:])
+
+    def test_every_caption_is_complete_in_last_two_rows(self):
+        for w,h in ((64,24),(80,30),(120,30),(128,44),(180,55)):
+            for cue in self.film.lyrics:
+                t=cue['time']+min(.05,(cue['end']-cue['time'])/2)
+                with self.subTest(size=(w,h),time=t):
+                    c=self.film.render(t,w,h,hud_visible=False)
+                    self.assertEqual(''.join(ch for ch,_ in c.cells[-2]).strip(),cue['en'])
+                    self.assertEqual(''.join(ch for ch,_ in c.cells[-1]).strip(),cue['zh'])
+                    self.assertTrue(all(ch in ' ._:=|' for ch,_ in c.cells[-3]))
+
+    def test_spectrum_has_own_row_above_captions(self):
+        for w,h in ((64,24),(80,30),(120,30),(128,44),(180,55)):
+            with self.subTest(size=(w,h)):
+                with patch.object(self.film,'energy',return_value=[1.]*48), \
+                     patch('scenes.draw_scene'), patch('scenes.phosphor'):
+                    c=self.film.render(67.3,w,h,hud_visible=False)
+                self.assertEqual(''.join(ch for ch,_ in c.cells[-3]).strip(),'|'*min(80,w-8))
+                self.assertTrue(all(ch==' ' for row in c.cells[1:-3] for ch,_ in row))
+
+    def test_scene_bounds_reserve_exactly_three_footer_rows(self):
+        for w,h in ((64,24),(80,30),(120,30),(128,44),(180,55)):
+            bounds=[]
+            def scene(c,t,top,bottom,music,cue):
+                bounds.append((top,bottom))
+                c.put(2,bottom,'BODY BOTTOM')
+                c.put(2,bottom+1,'LEAK')
+            with patch('scenes.draw_scene',side_effect=scene), patch('scenes.phosphor'):
+                for state in ({},{'paused':True},{'help_on':True},{'ready':True}):
+                    c=self.film.render(67.3,w,h,hud_visible=False,**state)
+                    self.assertNotIn('LEAK',c.plain())
+                    if not state:self.assertIn('BODY BOTTOM',''.join(ch for ch,_ in c.cells[h-4]))
+            self.assertEqual(bounds,[(1,h-4)]*4)
+
+    def test_title_uses_same_expanded_scene_area(self):
+        for w,h in ((64,24),(120,30),(128,44)):
+            def title(c,*args):
+                self.assertEqual(c.h,h-4)
+                c.put(2,c.h-1,'TITLE BOTTOM')
+            with patch('scenes.title_takeover',side_effect=title):
+                c=self.film.render(23.5,w,h,hud_visible=False)
+            self.assertIn('TITLE BOTTOM',''.join(ch for ch,_ in c.cells[h-4]))
+
+    def test_footer_stays_clear_of_paused_help_and_interludes(self):
+        for w,h in ((64,24),(80,30),(120,30),(128,44),(180,55)):
+            for t in (23.5,67.3,93.2,211.8):
+                normal=self.film.render(t,w,h,hud_visible=False)
+                for state in ({'paused':True},{'help_on':True}):
+                    with self.subTest(size=(w,h),time=t,state=state):
+                        shown=self.film.render(t,w,h,**state)
+                        self.assertEqual(normal.cells[-3:],shown.cells[-3:])
 
     def test_paused_and_help_show_controls(self):
         self.assertIn('SPACE play/pause', self.film.render(67.3,128,44,paused=True).plain())
@@ -39,7 +91,7 @@ class LayoutTests(unittest.TestCase):
     def test_caption_offset_does_not_retime_animation(self):
         a=self.film.render(113.0,128,44,offset=0,hud_visible=False)
         b=self.film.render(113.0,128,44,offset=1,hud_visible=False)
-        self.assertEqual(a.cells[:38],b.cells[:38])
+        self.assertEqual(a.cells[:-2],b.cells[:-2])
 
     def test_scaled_bitmap_preserves_strokes_and_column_width(self):
         c=Canvas(30,20)
@@ -186,8 +238,8 @@ class TimelineRenderingTests(unittest.TestCase):
         from scenes import lyric_execution_queue
         for event in self.film.music.at(0).events('execution'):
             t=event.time+.033
-            direct=Canvas(128,44);direct.clip=(1,36)
-            lyric_execution_queue(direct,t,(2,1,125,36),self.film.music.at(t))
+            direct=Canvas(128,44);direct.clip=(1,40)
+            lyric_execution_queue(direct,t,(2,1,125,40),self.film.music.at(t))
             final=self.film.render(t,128,44,hud_visible=False)
             for (x,y),cell in direct.protected.items():
                 self.assertEqual(final.cells[y][x],cell,(event.time,x,y))
@@ -195,7 +247,8 @@ class TimelineRenderingTests(unittest.TestCase):
     def test_small_execution_fallback_is_protected_from_glitch(self):
         for frame in range(24):
             c=self.film.render(172.712+frame/60,64,24,hud_visible=False)
-            self.assertIn('EXECUTION',''.join(ch for ch,_ in c.cells[8]))
+            body='\n'.join(''.join(ch for ch,_ in row) for row in c.cells[1:-3])
+            self.assertIn('EXECUTION',body)
 
 
 if __name__ == '__main__':

@@ -157,7 +157,8 @@ class Film:
             c.center(h//2+4,'SPACE pause  Q quit',DIM)
             return c
         e=self.cue(t+offset)
-        top=1; bottom=h-8
+        top=1; bottom=h-4
+        spectrum_y=bottom+1; english_y=bottom+2; chinese_y=bottom+3
         spec=self.energy(t)
         music=self.music.at(t)
         c.clip=(top,bottom)
@@ -177,28 +178,27 @@ class Film:
             c.restore_protected()
         c.clip=None
         # Spectrum is measured from the supplied song, sampled on the audio clock.
-        sy=h-6; cols=min(80,w-8); start=(w-cols)//2
+        cols=min(80,w-8); start=(w-cols)//2
         for i in range(cols):
             amp=spec[int(i*48/cols)]; level=max(0,round(amp*3))
-            c.put(start+i,sy,'._:=|'[min(4,round(amp*4))],DIM)
+            c.put(start+i,spectrum_y,'._:=|'[min(4,round(amp*4))],DIM)
         if ready:
-            c.center(h-5,'MILI  /  world.execute(me);',WHITE)
-            c.center(h-3,'[ SPACE / ENTER TO START ]',BRIGHT)
+            c.center(english_y,'MILI  /  world.execute(me);',WHITE)
+            c.center(chinese_y,'[ SPACE / ENTER TO START ]',BRIGHT)
         elif e:
-            ens=wrap(e['en'],w-8); zhs=wrap(e['zh'],w-8)
-            # Two reserved lines per language prevent changes in caption position.
+            # Every shipped cue fits on one line per language at 64 columns.
             accent=0<=t+offset-e['time']<.25 and any(event.label==e['en'] for event in music.events('accent'))
-            for i,line in enumerate(ens[:2]):c.center(h-5+i,line,BRIGHT if accent else WHITE)
-            for i,line in enumerate(zhs[:2]):c.center(h-3+i,line,WHITE if accent else BRIGHT)
+            c.center(english_y,e['en'],BRIGHT if accent else WHITE)
+            c.center(chinese_y,e['zh'],WHITE if accent else BRIGHT)
         elif t>208:
-            c.center(h-5,'PROCESS ENDED. THE LOOP REMAINS.',WHITE)
+            c.center(english_y,'PROCESS ENDED. THE LOOP REMAINS.',WHITE)
         else:
-            c.center(h-5,'[ instrumental ]',DIM)
-            c.center(h-3,'[ 间奏 ]',DIM)
+            c.center(english_y,'[ instrumental ]',DIM)
+            c.center(chinese_y,'[ 间奏 ]',DIM)
         if ready:self.slate(c,top,bottom)
         if hud_visible is None:hud_visible=ready or paused or help_on or t<3
         if hud_visible:
-            for row in (0,1,2,h-1):c.put(0,row,' '*w,DIM)
+            for row in (0,1,2):c.put(0,row,' '*w,DIM)
             c.put(2,0,'WORLD.EXECUTE(ME);',BRIGHT)
             state='READY' if ready else ('PAUSED' if paused else 'RUNNING')
             end=self.config['duration']
@@ -206,9 +206,8 @@ class Film:
             c.put(w-width(clock)-2,0,clock,DIM)
             act=max(x for x in CHAPTERS if x[0]<=max(0,t))
             c.put(2,1,act[1],NORMAL)
-            c.put(2,2,'-'*(w-4),DIM)
             hint='SPACE play/pause   <- -> 5s   R restart   Q quit   H help'
-            c.center(h-1,crop(hint,w-4),DIM)
+            c.center(2,crop(hint,w-4),DIM)
         if help_on:self.help(c,offset)
         return c
     def slate(self,c,top,bottom):

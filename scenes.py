@@ -2,6 +2,7 @@
 import math
 
 TAU=math.tau
+CELL_ASPECT=.5  # Terminal cell width / height.
 D,N,B,W,R,G,K,Y=0,1,2,3,4,5,6,3  # Y=Yellow (use white=3 as bright yellow)
 RD=7
 
@@ -63,6 +64,48 @@ def simple_area(c,top,bt):
     return (2,top,c.w-3,bt)
 
 # ============ ROTATION & 3D ============
+def fit_scale(area,width=2,height=2):
+    """Columns per model unit, fitted on both axes with one physical scale."""
+    l,top,r,bt=area
+    return min((r-l)/width,(bt-top)/(height*CELL_ASPECT))
+
+# An authored heart is slightly wider than it is tall; it is not a circle.
+HEART_WIDTH,HEART_HEIGHT=2.44,2.
+
+def _heart_profile():
+    """Scan-convert the classic parametric contour once, using only math."""
+    right=[]
+    for i in range(257):
+        a=i*math.pi/256
+        right.append((16*math.sin(a)**3,
+                      -(13*math.cos(a)-5*math.cos(2*a)-2*math.cos(3*a)-math.cos(4*a))))
+    low=min(y for _,y in right);high=max(y for _,y in right)
+    right=[(x/16*HEART_WIDTH/2,(y-low)/(high-low)) for x,y in right]
+    points=right+[(-x,y) for x,y in reversed(right[1:-1])]
+    rows=[[] for _ in range(1024)]
+    for (x0,y0),(x1,y1) in zip(points,points[1:]+points[:1]):
+        if y0==y1:continue
+        first=max(0,math.ceil(min(y0,y1)*len(rows)-.5))
+        last=min(len(rows),math.ceil(max(y0,y1)*len(rows)-.5))
+        for row in range(first,last):
+            y=(row+.5)/len(rows)
+            rows[row].append(x0+(x1-x0)*(y-y0)/(y1-y0))
+    return tuple(tuple(sorted(row)) for row in rows)
+
+_HEART_PROFILE=_heart_profile()
+
+def heart_contains(x,y):
+    """Test the shared silhouette in model coordinates (up is positive y)."""
+    if not -1<y<=1:return False
+    row=min(len(_HEART_PROFILE)-1,int((1-y)*.5*len(_HEART_PROFILE)))
+    spans=_HEART_PROFILE[row]
+    return bool(spans) and (spans[0]<=x<=spans[1] or
+                           len(spans)==4 and spans[2]<=x<=spans[3])
+
+def heart_edge(x,y,dx,dy):
+    return not (heart_contains(x-dx,y) and heart_contains(x+dx,y) and
+                heart_contains(x,y-dy) and heart_contains(x,y+dy))
+
 def rot(x,y,z,t):
     a,b=t*.37,t*.23
     x,z=x*math.cos(a)+z*math.sin(a),z*math.cos(a)-x*math.sin(a)
@@ -73,7 +116,8 @@ def point(x,y,z,area,t=0,rotate=True):
     if rotate:x,y,z=rot(x,y,z,t)
     l,top,r,bt=area
     p=3.7/(3.7+z)
-    return (l+r)/2+x*(r-l)*.34*p,(top+bt)/2+y*(bt-top)*.34*p,z
+    scale=fit_scale(area)*.68
+    return (l+r)/2+x*scale*p,(top+bt)/2+y*scale*CELL_ASPECT*p,z
 
 def projected(c,vertices,edges,area,t,style=N,reveal=1):
     ps=[point(*v,area,t) for v in vertices]
@@ -1185,7 +1229,7 @@ def lyric_happy_execution(c,t,area,music):
     elapsed=t-66.601
     loading=t>=68.252
     executing=t>=69.259
-    rail=max(13,min(24,c.w//5))
+    rail=max(9,min(22,(c.w-8)//6))
     left=l;right=r-rail+1
     mid_l=left+rail+2;mid_r=right-3;mw=mid_r-mid_l+1
     frame=int(elapsed*(30 if executing else 18 if loading else 10))
@@ -1193,6 +1237,7 @@ def lyric_happy_execution(c,t,area,music):
     # Scroll memory upward on the left and the instruction queue downward on the right.
     for x,label,side in ((left,'MEM / YOU',0),(right,'EXEC / ME',1)):
         c.box(x,top,rail,bt-top+1,B)
+        if rail<13:label='YOU' if side==0 else 'ME'
         c.put(x+2,top,label[:rail-4],W)
         for row in range(top+1,bt):
             index=frame+(row-top) if side==0 else frame-(row-top)
@@ -1211,20 +1256,21 @@ def lyric_happy_execution(c,t,area,music):
 
     middle(top,'IF (YOU.HAPPY) -> EXECUTE(ME)',W if loading else B)
     middle(top+1,'SELF.EXECUTION / '+('RUNNING' if executing else 'ARMED' if loading else 'CONDITION'),N)
-    content_top=top+3;content_bt=bt-3
+    content_top=top+2;content_bt=bt-2
     center_y=(content_top+content_bt)/2
-    half_h=max(2,(content_bt-content_top)*0.43)
-    half_w=max(5,mw*0.40)
+    # Fit the same authored silhouette at rest and at its beat peak.
+    half_w=fit_scale((mid_l,content_top,mid_r,content_bt),HEART_WIDTH,HEART_HEIGHT)*.99/1.07
+    half_h=half_w*CELL_ASPECT
     beat=1+music.low*music.beat*.07
+    step_x=1/(half_w*beat);step_y=1/(half_h*beat)
     morph=clamp((t-68.252)/(69.259-68.252)) if loading else 0
     # A large data-filled heart. Its own cells become the execution buffer.
     for yy in range(content_top,content_bt+1):
         for xx in range(mid_l,mid_r+1):
-            nx=(xx-cx)/(half_w*beat)
-            ny=-(yy-center_y)/(half_h*beat)+0.20
-            heart=(nx*nx+ny*ny-1)**3-nx*nx*ny**3
+            nx=(xx-cx)*step_x
+            ny=-(yy-center_y)*step_y
             seed=hash16(xx*79+yy*233)
-            if heart<=0 and not executing:
+            if heart_contains(nx,ny) and not executing:
                 if seed/65535<morph:
                     # Removed heart cells spread out across the entire center.
                     dx=int((xx-cx)*morph*0.9)
@@ -1233,10 +1279,10 @@ def lyric_happy_execution(c,t,area,music):
                     c.put(px,py,'01EX'[seed%4],G if morph>.7 else N)
                 else:
                     scan=(yy-content_top-int(elapsed*9))%max(1,content_bt-content_top+1)
-                    # Use the implicit equation only as a silhouette mask. Its magnitude
-                    # has three interior basins, so thresholding it creates false holes.
                     texture=hash16(seed+frame//2)
-                    c.put(xx,yy,'01'[texture%2] if texture%8<2 else '#',W if scan<2 else B)
+                    edge=heart_edge(nx,ny,step_x,step_y)
+                    c.put(xx,yy,'#' if edge else '01'[texture%2] if texture%8<2 else '.',
+                          W if edge else B if scan<1 else N)
             elif executing:
                 # Expanding execution wave and dim opcode fragments behind the title.
                 radius=abs(xx-cx)/max(1,mw/2)+abs(yy-center_y)/max(1,half_h)
@@ -1253,9 +1299,9 @@ def lyric_happy_execution(c,t,area,music):
             step=max(0,head-tail)
             ink=W if tail==0 else B if tail<2 else G
             for xx,head_char in ((mid_l+step,'>'),(mid_r-step,'<')):
-                nx=(xx-cx)/(half_w*beat)
-                ny=-(yy-center_y)/(half_h*beat)+.20
-                inside=(nx*nx+ny*ny-1)**3-nx*nx*ny**3<=0
+                nx=(xx-cx)*step_x
+                ny=-(yy-center_y)*step_y
+                inside=heart_contains(nx,ny)
                 if inside and not loading:
                     # Packets brighten the solid fill instead of cutting dark dashes into it.
                     c.put(xx,yy,'#' if tail==0 else '01'[(xx+yy+frame)%2],W if tail==0 else B)
@@ -1368,25 +1414,22 @@ def lyric_trapped_simulation(c,t,area,music):
 
 
 def lyric_heart(c,t,area,elapsed,pulse):
-    """Heart model - pulsing 3D heart"""
-    l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
-    # Heart shape equation
-    scale=0.5+pulse*0.15+elapsed*0.03
-    for angle_i in range(60):
-        for rad_i in range(15):
-            angle=angle_i*TAU/60
-            rad=rad_i/15
-            # Heart equation
-            x=16*math.sin(angle)**3
-            y=-(13*math.cos(angle)-5*math.cos(2*angle)-2*math.cos(3*angle)-math.cos(4*angle))
-            x,y=x*scale*rad/17,y*scale*rad/17
-            px,py=cx+x*4,cy+y*2
-            if l<px<r and top<py<bt:
-                brightness=rad*(1+pulse*0.3)
-                c.put(px,py,'#' if brightness>0.8 else '*' if brightness>0.5 else '.',
-                      W if brightness>0.9 else B if brightness>0.6 else N)
+    """A pulsing, filled heart fitted to the supplied scene bounds."""
+    l,top,r,bt=area;cx,cy=(l+r)/2,(top+bt)/2
+    scale=fit_scale((l+2,top+2,r-2,bt-2),HEART_WIDTH,HEART_HEIGHT)*.96/1.07
+    scale*=(.85+.15*clamp(elapsed))*(1+.07*pulse)
+    step_x=1/scale;step_y=1/(scale*CELL_ASPECT)
+    outline=[]
+    for py in range(top+2,bt-1):
+        for px in range(l+2,r-1):
+            nx=(px-cx)*step_x;ny=-(py-cy)*step_y
+            if heart_contains(nx,ny):
+                edge=heart_edge(nx,ny,step_x,step_y)
+                c.put(px,py,'#' if edge else '.',W if edge else N)
+                if edge:outline.append((px,py))
     if elapsed>1:
         c.center(cy,'♥',R)
+    return outline
 
 
 
@@ -1623,10 +1666,10 @@ def lyric_daynight_clock(c,t,area):
     flip_at=94.55
     is_pm=t>=flip_at
     virtual=6+6*clamp((t-92.015)/(flip_at-92.015)) if not is_pm else 12+6*clamp((t-flip_at)/(95.465-flip_at))
-    clock_x=(l+cx)//2;display_x=(cx+r)//2
-    rx=max(6,(cx-l)*.43);ry=max(3,(bt-top-6)*.43)
+    clock_x=(l+cx)/2;display_x=(cx+r)/2
+    rx=min(fit_scale((l+1,top+1,cx-1,bt-1)),(bt-top+1)*.8)
+    ry=rx*CELL_ASPECT
     c.center(top,'CLOCK.CYCLE / AM -> PM',W)
-    c.center(top+1,'DAYLIGHT -> NIGHT / TIME ACCELERATING',B)
     # Clock face fills the left half instead of occupying a small central patch.
     for i in range(180):
         a=i*TAU/180
@@ -1643,24 +1686,24 @@ def lyric_daynight_clock(c,t,area):
     c.line(clock_x,cy,clock_x+math.sin(hour_angle)*rx*.52,cy-math.cos(hour_angle)*ry*.52,'#',B)
     c.line(clock_x,cy,clock_x+math.sin(minute_angle)*rx*.83,cy-math.cos(minute_angle)*ry*.83,'*',W)
     c.put(clock_x,cy,'@',W)
-    c.line(cx,top+3,cx,bt-3,'|',G)
+    c.line(cx,top+1,cx,bt-1,'|',G)
     # Day/night symbol and huge AM/PM bitmap occupy the entire right pane.
-    radius=max(3,min((r-cx)*.22,(bt-top)*.34))
+    radius=fit_scale((cx+2,top+2,r-1,bt-2))*.68
     for i in range(120):
         a=i*TAU/120
-        x=display_x+math.cos(a)*radius*1.6;y=cy+math.sin(a)*radius
+        x=display_x+math.cos(a)*radius;y=cy+math.sin(a)*radius*CELL_ASPECT
         if not is_pm or math.cos(a)<.45:c.put(x,y,':',G if is_pm else N)
     if not is_pm:
         for ray in range(16):
             a=ray*TAU/16+age*.25
-            c.line(display_x+math.cos(a)*radius*1.8,cy+math.sin(a)*radius*1.1,
-                   display_x+math.cos(a)*radius*2.1,cy+math.sin(a)*radius*1.3,'.',G)
+            c.line(display_x+math.cos(a)*radius*1.1,cy+math.sin(a)*radius*CELL_ASPECT*1.1,
+                   display_x+math.cos(a)*radius*1.3,cy+math.sin(a)*radius*CELL_ASPECT*1.3,'.',G)
     else:
         for star in range(22):
             x=cx+2+hash16(star*31)%max(1,r-cx-4)
-            y=top+3+hash16(star*79)%max(1,bt-top-6)
+            y=top+1+hash16(star*79)%max(1,bt-top-1)
             c.put(x,y,'+' if (int(age*5)+star)%5==0 else '.',G)
-    sx=max(1,min(4,(r-cx-6)//11));sy=max(1,min(4,(bt-top-8)//5))
+    sx=sy=max(1,min(4,(r-cx-4)//11,(bt-top-6)//5))
     glyph_w=11*sx;glyph_h=5*sy;y0=cy-glyph_h//2
     clear(c,display_x-glyph_w//2-1,y0-1,glyph_w+2,glyph_h+2)
     identity_bitmap(c,display_x-glyph_w//2,y0,'PM' if is_pm else 'AM',sx,sy,W)
@@ -1670,8 +1713,7 @@ def lyric_daynight_clock(c,t,area):
         c.put(display_x-glyph_w//2,yy,'='*glyph_w,W)
     hour=int(virtual)%24;minute=int((virtual%1)*60)
     c.put(display_x-2,min(bt-3,y0+glyph_h+1),f'{hour:02d}:{minute:02d}',W)
-    c.center(bt-1,'[ PM / NIGHT CYCLE ]' if is_pm else '[ AM / DAY CYCLE ]',B)
-    c.center(bt,'do_whatever();  // AM -> PM',N)
+    c.center(bt,('[ PM / NIGHT CYCLE ]' if is_pm else '[ AM / DAY CYCLE ]')+' do_whatever(); // AM -> PM',B)
 
 
 def lyric_gender_role_switch(c,t,area,elapsed,from_label,to_label):
@@ -1990,21 +2032,29 @@ def lyric_erase_fragments(c,t,area,elapsed):
     if repair:
         build=clamp((t-121.728)/1.5)
         split=clamp((t-123.25)/(125.708-123.25))
-        half_w=(r-l)*.27;half_h=max(2,(bt-top)*.31)
+        # Fit the displaced fragments, including their maximum possible fall, before drawing.
+        drift=int(split*5);fall_max=int(split*split*5) if broken else 0
+        heart_bt=bt-2-fall_max;heart_y=(top+2+heart_bt)/2
+        half_w=fit_scale((l+5+drift,top+2,r-5-drift,heart_bt),HEART_WIDTH,HEART_HEIGHT)*.96
+        half_h=half_w*CELL_ASPECT
+        step_x=1/half_w;step_y=1/half_h
         for yy in range(top+2,bt-1):
             for xx in range(l+5,r-4):
-                nx=(xx-cx)/half_w;ny=-(yy-cy)/half_h+.15
-                shape=(nx*nx+ny*ny-1)**3-nx*nx*ny**3
+                nx=(xx-cx)*step_x;ny=-(yy-heart_y)*step_y
                 seed=hash16(xx*31+yy*73)
-                if shape<=0 and seed/65535<build:
+                if heart_contains(nx,ny):
+                    edge=heart_edge(nx,ny,step_x,step_y)
+                    if seed/65535>=build:
+                        if edge:c.put(xx,yy,'#',G)
+                        continue
                     crack=abs(nx-.11*math.sin(ny*8))<split*.17
                     if crack:continue
                     dx=int((1 if nx>0 else -1)*split*5)
                     fall=int(split*split*(1+seed%5)) if broken else 0
-                    py=min(bt-1,yy+fall)
+                    py=yy+fall
                     texture=hash16(seed+int(t*10))
-                    char=('x' if broken else '01'[texture%2]) if texture%8<2 else '#'
-                    c.put(xx+dx,py,char,R if broken else B)
+                    char='#' if edge else ('x' if broken else '01'[texture%2]) if texture%8<2 else '.'
+                    c.put(xx+dx,py,char,(R if edge else RD) if broken else W if edge else N)
         c.center(top+1,'HEART.RESTORE() -> NULL' if broken else 'RECOVERING YOU... CHECKSUM MISMATCH',R if broken else N)
         if broken:
             clear(c,l,max(top+2,int(cy)-2),r-l+1,5)
@@ -2225,8 +2275,8 @@ def lyric_only_execution(c,t,area,music):
     age=t-162.632
     rail=max(10,min(20,c.w//7))
     ml=l+rail+1;mr=r-rail-1;mw=mr-ml+1
-    plot_top=top+3;plot_bt=bt-3
-    rh=max(2,(plot_bt-plot_top)*.45);rw=mw*.43
+    plot_top=top+2;plot_bt=bt-2
+    rw=fit_scale((ml,plot_top,mr,plot_bt),HEART_WIDTH,HEART_HEIGHT)*.96/1.07;rh=rw*CELL_ASPECT
     stage=0 if t<166.016 else 1 if t<169.824 else 2 if t<173.643 else 3
     frame=int(age*22)
     def middle(y,text,ink=N):
@@ -2249,23 +2299,17 @@ def lyric_only_execution(c,t,area,music):
             c.put(x+1,yy,text[:rail-2],R if index%7==0 else N if index%3 else G)
     def heart(scale=1,filled=False):
         beat=1+music.low*music.beat*.07
+        step_x=1/max(1,rw*scale*beat);step_y=1/max(1,rh*scale*beat)
         for yy in range(plot_top,plot_bt+1):
             for xx in range(ml,mr+1):
-                nx=(xx-cx)/max(1,rw*scale*beat)
-                ny=-(yy-cy)/max(1,rh*scale*beat)+.18
-                shape=(nx*nx+ny*ny-1)**3-nx*nx*ny**3
-                if shape<=0:
-                    if filled:
+                nx=(xx-cx)*step_x
+                ny=-(yy-cy)*step_y
+                if heart_contains(nx,ny):
+                    edge=heart_edge(nx,ny,step_x,step_y)
+                    if edge:c.put(xx,yy,'#',R)
+                    elif filled:
                         texture=hash16(xx*31+yy*73+frame)
-                        c.put(xx,yy,'01'[texture%2] if texture%8<2 else '#',R)
-                    else:
-                        # An outline follows the silhouette, not internal level sets.
-                        for ox,oy in ((1,0),(-1,0),(0,1),(0,-1)):
-                            ex=nx+ox/max(1,rw*scale*beat)
-                            ey=ny+oy/max(1,rh*scale*beat)
-                            if (ex*ex+ey*ey-1)**3-ex*ex*ey**3>0:
-                                c.put(xx,yy,'#',R)
-                                break
+                        c.put(xx,yy,'01'[texture%2] if texture%8<2 else '.',RD)
     def node(x,y,text,ink=B):
         x=int(x);y=int(y)
         clear(c,x-4,y-1,9,3)
@@ -2310,12 +2354,8 @@ def lyric_only_execution(c,t,area,music):
                 if plot_top<y<plot_bt:c.put(x,y,':',G)
         middle(top,'YOU.OWNER = ME / EXCLUSIVE ACCESS',R)
         middle(top+1,f'BIND {int(bind*100):03d}% / ALTERNATIVES: 0',B)
-        if mw>=53 and bt-top>=22:
-            banner(cy-5,'THE ONLY',W)
-            banner(cy+1,'EXECUTION',R if t>=168.911 else B)
-        else:
-            middle(cy-3,'THE ONLY',W)
-            banner(cy-1,'EXECUTION',R if t>=168.911 else B)
+        if t>=168.911:banner(cy-2,'EXECUTION',R)
+        else:middle(cy,'THE ONLY',W)
     elif stage==2:
         # "Have you back": an absent YOU is reconstructed and pulled into the lock.
         capture=clamp((t-169.824)/(172.712-169.824))
@@ -2515,7 +2555,7 @@ def lyric_trapped_loop(c,t,area,elapsed,pulse):
     """Trapped in loop - prison bars over heart"""
     l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
     # Heart (reuse)
-    lyric_heart(c,t,area,min(elapsed,2),pulse)
+    outline=lyric_heart(c,t,area,min(elapsed,2),pulse)
     # Prison bars
     num_bars=8
     for i in range(num_bars):
@@ -2525,8 +2565,9 @@ def lyric_trapped_loop(c,t,area,elapsed,pulse):
             # Moving lock symbols
             if (y+int(t*6))%7==0:
                 c.put(x,y,'▓',W)
+    for x,y in outline:c.put(x,y,'#',W)
     if elapsed>1:
-        c.center(cy+int((bt-top)*0.35),'TRAPPED',R)
+        c.center(bt,'TRAPPED',R)
 
 def lyric_outro_wait(c,t,area,music):
     """Stillness at 99%, one red execution, then a finite phosphor decay."""
