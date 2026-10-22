@@ -7,13 +7,12 @@ from pathlib import Path
 from terminal import Terminal
 from music import MusicTimeline
 from render_output import encode_frame
+from visuals import STYLES
 
 ROOT = Path(__file__).resolve().parent
 TAU = math.tau
 ESC = '\x1b['
 DIM, NORMAL, BRIGHT, WHITE, RED = 0, 1, 2, 3, 4
-STYLES = {0:'\x1b[0;38;5;137m',1:'\x1b[0;38;5;215m',2:'\x1b[1;38;5;221m',3:'\x1b[1;38;5;230m',4:'\x1b[1;38;5;203m',5:'\x1b[0;38;5;94m',6:'\x1b[0;38;5;58m'}
-STYLES[7]='\x1b[0;38;5;131m'
 
 FONT = {
 'A':['01110','11011','11111','11011','11011'], 'B':['11110','11011','11110','11011','11110'],
@@ -163,11 +162,11 @@ class Film:
         music=self.music.at(t)
         c.clip=(top,bottom)
         from scenes import draw_scene, phosphor, title_takeover
-        if 15.8<=t<29.709 and not ready:
+        if 16.0<=t<29.709 and not ready:
             title=Canvas(w,bottom-top+1)
             source=None
-            if t<18.1:
-                before=self.render(15.799,w,h,paused,offset,False,False,False)
+            if t<music.anchor('title_lock'):
+                before=self.render(15.999,w,h,paused,offset,False,False,False)
                 source=Canvas(w,title.h)
                 source.cells=[row[:] for row in before.cells[top:bottom+1]]
             title_takeover(title,t,FONT,music,source)

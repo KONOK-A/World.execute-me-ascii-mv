@@ -37,7 +37,8 @@ class BundleTests(unittest.TestCase):
             self.assertEqual(manifest['sys_platform'], sys.platform)
             self.assertIn('media/song.wav', manifest['files'])
             self.assertIn('terminal.py', manifest['files'])
-            for required in ('music.py','render_output.py','music_features.json','score.json'):
+            for required in ('music.py','render_output.py','music_features.json','score.json',
+                             'visuals.py','scenes_organic.py','scenes_learning.py'):
                 self.assertIn(required,manifest['files'])
             self.assertIn('windows_audio.ps1' if sys.platform == 'win32' else 'audio-clock', manifest['files'])
             for name, digest in manifest['files'].items():

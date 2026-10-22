@@ -55,17 +55,17 @@ class PlaybackClockTests(unittest.TestCase):
     def test_transient_playing_zero_at_eof_does_not_render_boot(self):
         frames=self.replay(((211.829,True),(0,True),(211.98365,False)))
         self.assertEqual([t for t,_ in frames],[211.829,211.829,211.98365])
-        self.assertNotIn('01 POWER',frames[1][1])
+        self.assertNotIn('POWER / CHECK',frames[1][1])
 
     def test_stopped_zero_at_eof_keeps_the_final_scene(self):
         frames=self.replay(((211.829,True),(0,False),(211.96365,False)))
         self.assertEqual(frames[1][0],211.98365)
-        self.assertNotIn('01 POWER',frames[1][1])
+        self.assertNotIn('POWER / CHECK',frames[1][1])
 
     def test_restart_accepts_zero_even_before_playing_acknowledgement(self):
         frames=self.replay(((211.829,True),(0,False),(0,False),(.1,True)),{0:'r'})
         self.assertEqual([t for t,_ in frames],[211.829,0,0,.1])
-        self.assertIn('01 POWER',frames[1][1])
+        self.assertIn('POWER / CHECK',frames[1][1])
 
     def test_chapter_seek_is_not_mistaken_for_eof_rewind(self):
         for key,target in (('1',0),('2',29.709),('5',177.246)):

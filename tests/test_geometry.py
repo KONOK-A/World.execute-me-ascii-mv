@@ -128,6 +128,38 @@ class PhysicalGeometryTests(unittest.TestCase):
                     self.assertEqual(len(headers), 1)
                     self.assertEqual(len(footers), 1)
 
+    def test_clock_has_twelve_centered_roman_numerals_in_clockwise_order(self):
+        roman=('XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI')
+        for size in SIZES:
+            with self.subTest(size=size):
+                c,area=self.canvas(size)
+                lyric_daynight_clock(c,93.2,area)
+                labels=[(int(x),int(y),text) for x,y,text,ink in c.requests if text in roman]
+                self.assertEqual([text for x,y,text in labels],list(roman))
+                cx,cy=next((x,y) for x,y,text,ink in c.requests if text=='@')
+                top,right,bottom,left=(labels[i] for i in (0,3,6,9))
+                self.assertLess(top[1],cy)
+                self.assertGreater(right[0],cx)
+                self.assertGreater(bottom[1],cy)
+                self.assertLess(left[0],cx)
+                self.assertLessEqual(abs(top[0]+1-cx),.5)
+                for x,y,text in labels:
+                    self.assert_inside([(x,y),(x+len(text)-1,y)],area)
+
+    def test_roman_numerals_survive_hands_and_composed_role_overlays(self):
+        from player import Film
+        film=Film();roman={'XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'}
+        for size in SIZES:
+            for t in (92.1,92.5,93.2,93.8,94.55,95.2,95.45):
+                with self.subTest(size=size,time=t):
+                    c,area=self.canvas(size)
+                    lyric_daynight_clock(c,t,area)
+                    final=film.render(t,*size,hud_visible=False)
+                    for x,y,text,ink in c.requests:
+                        if text in roman:
+                            shown=''.join(ch for ch,_ in final.cells[int(y)][int(x):int(x)+len(text)])
+                            self.assertEqual(shown,text)
+
     def test_clock_bitmap_preserves_font_with_one_integer_scale_and_retains_am_pm(self):
         for size in SIZES:
             for at, leading_pixel in ((93.2, False), (95.2, True)):

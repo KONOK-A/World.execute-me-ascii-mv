@@ -11,6 +11,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ('player.py', 'scenes.py', 'terminal.py', 'music.py', 'render_output.py',
+         'visuals.py', 'scenes_organic.py', 'scenes_learning.py',
          'config.json', 'lyrics.json', 'spectrum.json', 'music_features.json', 'score.json')
 
 

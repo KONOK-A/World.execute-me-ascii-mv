@@ -1,8 +1,9 @@
 """Lyric-driven choreography with escalating glitch effects. No sidebars."""
 import math
+import visuals as v
 
 TAU=math.tau
-CELL_ASPECT=.5  # Terminal cell width / height.
+CELL_ASPECT=v.CELL_ASPECT  # Terminal cell width / height.
 D,N,B,W,R,G,K,Y=0,1,2,3,4,5,6,3  # Y=Yellow (use white=3 as bright yellow)
 RD=7
 
@@ -401,10 +402,10 @@ def lyric_points_dimension(c,t,area,elapsed,music):
         num_lines=int(phase*15)+5
         for line_i in range(num_lines):
             # Random line endpoints
-            x1=l+hash16(line_i*11)%(r-l)
-            y1=top+hash16(line_i*17)%(bt-top)
-            x2=l+hash16(line_i*23)%(r-l)
-            y2=top+hash16(line_i*29)%(bt-top)
+            x1=l+hash16(line_i*7)%(r-l)
+            y1=top+hash16(line_i*13)%(bt-top)
+            x2=l+hash16((line_i+1)*7)%(r-l)
+            y2=top+hash16((line_i+1)*13)%(bt-top)
 
             # Draw line with trail
             steps=int(math.hypot(x2-x1,(y2-y1)*2))
@@ -453,7 +454,9 @@ def lyric_points_dimension(c,t,area,elapsed,music):
                 if gx<grid_density-1:
                     next_u=(gx+1)/(grid_density-1)
                     next_x=l+(r-l)*next_u
-                    c.line(x,y_displaced,next_x,y_displaced,'─',G)
+                    next_wave=math.sin(next_u*TAU*2+t)*math.cos(v*TAU*2-t*0.7)*phase
+                    next_y_displaced=y+next_wave*(bt-top)*0.1
+                    c.line(x,y_displaced,next_x,next_y_displaced,'─',G)
 
                 # Connect vertically
                 if gy<grid_density-1:
@@ -726,7 +729,7 @@ def lyric_sine_tangent(c,t,area,elapsed,music):
             tangent_x=wave_x+tx
             tangent_y=wave_y+slope*tx
             if l<tangent_x<r and top<tangent_y<bt:
-                c.put(tangent_x,tangent_y,'─' if abs(slope)<0.3 else '/' if slope>0 else '\\',
+                c.put(tangent_x,tangent_y,'─' if abs(slope)<0.3 else '\\' if slope>0 else '/',
                       Y if i==num_tangents-1 else G)
 
     # Show derivative formula
@@ -808,55 +811,26 @@ def lyric_infinity_limit(c,t,area,elapsed,music):
 
 
 def lyric_ac_dc(c,t,area,elapsed,music):
-    """Split-screen AC sine wave and a DC voltage step, like a CRT scope."""
-    l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
-    amplitude=max(2,(bt-top-4)*(.30+.035*music.low*music.beat))
-    left_span=max(1,cx-l-2)
+    """One live signal is rectified; the receiver observes the actual new current."""
+    l,top,r,bt=area;cx=(l+r)/2
+    plot_top=top+(6 if c.h>=34 else 4);plot_bt=bt-3;cy=(plot_top+plot_bt)/2
+    u=clamp((t-45.85)/1.10);amp=max(2,(plot_bt-plot_top)*.34)
+    x0=l+12;x1=r-12;span=max(1,x1-x0)
     phase=music.beat_position*TAU*.5
-    # A quiet, delayed trace supplies the phosphor tail behind the moving AC wave.
+    for y in range(plot_top,plot_bt+1,3):c.put(x0,y,':'*max(0,int(span)),v.SHADE)
     for trail in (1,0):
         previous=None
-        for sample in range(left_span*3+1):
-            xx=l+1+sample/3
-            yy=cy-math.cos((xx-l-1)/left_span*TAU*2-phase+trail*.13)*amplitude
-            if previous:
-                px,py=previous
-                c.line(px,py,xx,yy,':' if trail else '.',G if trail else N)
-            previous=(xx,yy)
-    # The new DC level sweeps across the old one, then holds steady.
-    dc_progress=clamp((t-45.85)/1.10)
-    edge=int(mix(r,cx+1,dc_progress))
-    low=int(cy+amplitude);high=int(cy-amplitude)
-    if edge>cx+1:c.line(cx+1,low,edge,low,':',N)
-    if edge<r:
-        c.line(edge,high,r,high,':',B)
-        if dc_progress<1:
-            c.line(edge,low,edge,high,'|',G)
-            c.put(edge,high,'+',W)
-    # A full-height dividing line separates the two current modes.
-    c.line(cx,top,cx,bt-1,'|',B)
-    c.put(cx,top,'+',W)
-    c.put(cx,bt-1,'+',B)
-
-    # The same five-row character shapes as the player's existing bitmap font.
-    glyphs={'A':('01110','11011','11111','11011','11011'),
-            'C':('01111','11000','11000','11000','01111'),
-            'D':('11110','11011','11011','11011','11110')}
-    sx=max(1,min(3,c.w//60));sy=max(1,min(3,(bt-top)//12))
-    label_w=11*sx;label_h=5*sy
-    label_y=cy-label_h//2
-    def label(x,text,ink):
-        clear(c,x-1,label_y-1,label_w+2,label_h+2)
-        for index,ch in enumerate(text):
-            for dy,row in enumerate(glyphs[ch]):
-                for dx,pixel in enumerate(row):
-                    if pixel=='1':
-                        for yy in range(sy):
-                            c.put(x+(index*6+dx)*sx,label_y+dy*sy+yy,'#'*sx,ink)
-    # AC sits against the outer edge; DC occupies the center of the right half.
-    label(l+2,'AC',W if t<46.45 else B)
-    label((cx+r)//2-label_w//2,'DC',W if t>=45.85 else N)
-    c.center(bt,'to AC, to DC',B)
+        for index in range(int(span)*2+1):
+            x=x0+index/2
+            ac=math.sin((x-x0)/span*TAU*2-phase+trail*.15)
+            y=cy-mix(ac,1,u)*amp
+            if previous:c.line(*previous,x,y,'.',v.CYAN_DIM if trail else v.CYAN if u>.5 else B)
+            previous=(x,y)
+    v.actor(c,l+6,cy,'ME',radius=2)
+    v.actor(c,r-6,cy-amp*u,'YOU',radius=2)
+    c.put(x0,plot_top,'AC ~',B);c.put(x1-4,plot_top,'DC =',v.CYAN)
+    v.code_card(c,area,('ME.current = AC;','rectify(ME.current);','YOU.receive(DC);'),0 if t<45.85 else 1 if u<1 else 2)
+    c.center(bt,'CURRENT / AC -> DC / '+('STABLE OUTPUT' if u==1 else 'RECTIFYING'),B)
 
 
 def lyric_dizzy(c,t,area,elapsed):
@@ -1143,85 +1117,60 @@ def lyric_time_travel(c,t,area,elapsed):
                     c.put(fx, fy, '*', W if flash_radius<10 else B)
 
 def lyric_unite_deeply(c,t,area,elapsed):
-    """Unite so deeply - two forms merging"""
-    l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
-    progress=clamp(elapsed/1.8)
-    # Two circles moving together
-    sep=mix(40,0,progress)
-    for side,label in [(-1,'ME'),(1,'YOU')]:
-        center_x=cx+side*sep
-        radius=15
-        for i in range(60):
-            angle=i*TAU/60+t*side*0.2
-            x=center_x+math.cos(angle)*radius
-            y=cy+math.sin(angle)*radius*0.5
-            c.put(x,y,'@' if progress>0.7 and sep<5 else '*' if progress>0.4 else '.',
-                  W if progress>0.8 else B if progress>0.5 else N)
-        if sep>10:
-            c.put(center_x,cy-2,label,B)
-    if progress>0.7:
-        c.center(cy,'UNIFIED',W)
+    """Two distinct object memories braid into a shared address space."""
+    l,top,r,bt=area;cx=(l+r)/2;cy=(top+bt)/2+1
+    u=clamp(elapsed/(59.223-55.083));distance=mix((r-l)*.27,(r-l)*.10,u)
+    left=cx-distance;right=cx+distance
+    height=max(2,(bt-top-5)*.30)
+    ring_rows=min((bt-top-5)*.40,(left-l-1)*.5,(r-right-1)*.5)
+    for origin,ink in ((left,B),(right,v.CYAN)):
+        for ring in (.74,1.):
+            for index in range(100):
+                a=index*TAU/100
+                c.put(origin+math.cos(a)*ring_rows*2*ring,cy+math.sin(a)*ring_rows*ring,
+                      ':' if ring<1 else '.',v.ROSE_DIM if u>.72 else ink if ring==1 else G)
+    for strand in range(3):
+        previous=None
+        for index in range(81):
+            p=index/80;x=mix(left,right,p)
+            y=cy+math.sin(p*TAU*2+t*2+strand*TAU/3)*height*math.sin(p*math.pi)
+            ink=v.ROSE if u>.45 else B if strand%2 else v.CYAN
+            if previous:c.line(*previous,x,y,':' if strand else '.',ink)
+            previous=(x,y)
+    v.actor(c,left,cy,'ME',radius=3)
+    v.actor(c,right,cy,'YOU',radius=3)
+    v.code_card(c,area,('link = ME.connect(YOU);','link.share(memory);','link.commit();'),min(2,int(u*3)))
+    c.center(bt,'SHARED MEMORY / '+('UNIFIED' if u>.85 else 'TWO OBJECTS / ONE ADDRESS SPACE'),v.ROSE if u>.5 else B)
 
-def lyric_stimulation_satisfaction(c,t,area,elapsed):
-    """Give sensory impulses to YOU, then fill its satisfaction meter."""
-    l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
-    if t>=62.589:
-        # Reach maximum on the sung SATISFACTION, then hold it.
-        u=clamp((t-62.589)/(65.397-62.589))
-        percent=int(100*u)
-        full=u>=1
-        c.center(max(top,cy-7),f'SATISFACTION {percent:05.1f}%',W if full else B)
-        bar_x=l+3;bar_w=r-l-6;inside=bar_w-2
-        for lane in range(3):
-            y=cy-5+lane*2
-            amount=clamp(u-(1-u)*lane*0.13)
-            filled=int(inside*amount)
-            c.put(bar_x,y,'['+'-'*inside+']',N)
-            for col in range(filled):
-                scan=(col-int(t*26)-lane*7)%max(1,inside)
-                c.put(bar_x+1+col,y,'#' if lane==1 else '=',W if scan<5 or full else B)
-            if filled<inside:c.put(bar_x+1+filled,y,'>',W)
-        c.big(cy+1,str(percent),W if full else B)
-        c.center(min(bt,cy+7),'[ MAXIMUM ]' if full else '[ FILLING SATISFACTION ]',W if full else N)
-        return
-
-    # Parallel sensory paths: the giver drives each receiver with more pulses.
-    strength=clamp(elapsed/(61.958-59.223))
-    accent=t>=61.958
-    c.center(top,'STIMULATION / SENSORY INPUT',W if accent else B)
-    left_x=l+1;right_x=r-10
-    for x,label in ((left_x,'ME'),(right_x,'YOU')):
-        c.box(x,cy-2,10,5,B)
-        c.put(x+3,cy,label,W)
-    wire_l=left_x+12;wire_r=right_x-3;span=wire_r-wire_l
-    lanes=5 if bt-top>=22 else 3
-    gap=max(2,min(4,(bt-top-6)//max(1,lanes-1)))
-    names=['TOUCH','SOUND','LIGHT','REWARD','FEEDBACK']
+def lyric_stimulation_satisfaction(c,t,area,elapsed,music=None):
+    """Inputs, a visible response, and a growing closed-loop satisfaction signal."""
+    l,top,r,bt=area;cx=(l+r)/2
+    plot_top=top+(6 if c.h>=34 else 4);plot_bt=bt-3;cy=(plot_top+plot_bt)/2
+    left=l+(r-l)*.20;right=l+(r-l)*.73
+    satisfied=t>=62.589
+    strength=clamp((t-59.223)/(61.958-59.223))
+    fill=clamp((t-62.589)/(65.397-62.589)) if satisfied else 0
+    phase=music.beat_position*.6 if music else elapsed
+    pulse=music.low*music.beat if music else 0
+    lanes=3 if bt-top<28 else 5
     for lane in range(lanes):
-        y=cy+(lane-lanes//2)*gap
-        c.line(left_x+9,cy,wire_l,cy,'-',G)
-        c.line(wire_l,cy,wire_l,y,'|',G)
-        c.line(wire_l,y,wire_r,y,'-',N)
-        c.line(wire_r,y,wire_r,cy,'|',G)
-        c.line(wire_r,cy,right_x,cy,'-',G)
-        c.put(wire_l+2,y-1,names[lane],N)
-        for relay in (1,2):
-            rx=wire_l+span*relay//3
-            c.put(rx,y,'o',B)
-        speed=0.65+strength*0.75
-        for packet in range(3):
-            phase=(elapsed*speed-lane*0.17-packet/3)%1
-            head=wire_l+int(phase*span)
-            for trail in range(5):
-                xx=head-trail
-                if xx>wire_l:c.put(xx,y,'*' if trail==0 else '=' if trail<3 else '.',W if trail==0 else B if trail<3 else G)
-            if phase>0.88:
-                c.put(wire_r,y,'#',W)
-                c.put(right_x+1,cy+1,'ACTIVE',W)
-        if accent:
-            for xx in range(wire_l+1,wire_r):
-                if (xx+int(t*30)+lane)%7<2:c.put(xx,y,'#',W)
-    c.center(bt,f'INPUT {int(strength*100):03d}%  /  ALL CHANNELS '+('ACTIVE' if accent else 'CONNECTING'),B)
+        offset=(lane-(lanes-1)/2)*max(2,(plot_bt-plot_top)/(lanes+1))
+        start=(left+5,cy);end=(right-5,cy+offset*.35)
+        elbow=left+(right-left)*.3
+        c.line(start[0],start[1],elbow,cy+offset,'.',G)
+        v.signal(c,(elbow,cy+offset),end,phase+lane*.19,ink=v.ROSE if satisfied else B,amount=strength)
+    radius=min((r-right-2)*.5,(plot_bt-plot_top)*.47)
+    for i in range(120):
+        a=i*TAU/120
+        ink=v.ROSE if satisfied and i/120<=fill else v.CYAN_DIM
+        c.put(right+math.cos(a)*radius*2,cy+math.sin(a)*radius,'.',ink)
+    if satisfied:v.signal(c,(right-4,cy+3),(left+4,cy+3),phase,ink=v.CYAN)
+    v.actor(c,left,cy,'ME',radius=2.5)
+    v.actor(c,right,cy,'YOU',radius=2+min(1,fill+pulse*.2))
+    if satisfied:c.put(right-2,min(plot_bt,cy+4),f'{int(fill*100):03d}%',W)
+    lines=('signal = ME.offer();','YOU.respond(signal);','feedback = YOU.reply();','ME.satisfaction = feedback;')
+    v.code_card(c,area,lines,0 if t<61.958 else 1 if t<62.589 else 2 if fill<1 else 3)
+    c.center(bt,f'SATISFACTION {int(fill*100):03d}% / CLOSED LOOP' if satisfied else 'STIMULATION / INPUT -> RESPONSE',v.ROSE if satisfied else B)
 
 def lyric_happy_execution(c,t,area,music):
     """A happiness condition feeds a self-execution, with live data on both sides."""
@@ -1233,29 +1182,15 @@ def lyric_happy_execution(c,t,area,music):
     left=l;right=r-rail+1
     mid_l=left+rail+2;mid_r=right-3;mw=mid_r-mid_l+1
     frame=int(elapsed*(30 if executing else 18 if loading else 10))
-    ops=('READ','LOAD','PUSH','COPY','SYNC','CALL','EXEC','WAIT')
-    # Scroll memory upward on the left and the instruction queue downward on the right.
+    # Object ports remain visible while the highlighted call drives feedback.
     for x,label,side in ((left,'MEM / YOU',0),(right,'EXEC / ME',1)):
-        c.box(x,top,rail,bt-top+1,B)
-        if rail<13:label='YOU' if side==0 else 'ME'
-        c.put(x+2,top,label[:rail-4],W)
-        for row in range(top+1,bt):
-            index=frame+(row-top) if side==0 else frame-(row-top)
-            value=hash16(index*73+side*911)
-            address=(index*16)&65535
-            if side==0:
-                text=f'{address:04X} {value:04X} {hash16(index*29):04X}'
-            else:
-                op='EXEC' if executing and index%3==0 else ops[index%len(ops)]
-                text=f'{op} {address:04X} {value:04X}'
-            selected=(row-top+frame)%(bt-top-1)==0
-            c.put(x+1,row,('>' if selected else ' ')+text[:rail-3],W if selected else N if index%3 else G)
+        c.box(x,top,rail,bt-top+1,v.SHADE)
+        role='ME' if side==0 else 'YOU'
+        v.actor(c,x+rail/2,(top+bt)/2,role,radius=max(1,min(2,(rail-3)/4)))
     def middle(y,text,style=N):
         text=text[:mw]
         c.put(mid_l+(mw-len(text))//2,y,text,style)
 
-    middle(top,'IF (YOU.HAPPY) -> EXECUTE(ME)',W if loading else B)
-    middle(top+1,'SELF.EXECUTION / '+('RUNNING' if executing else 'ARMED' if loading else 'CONDITION'),N)
     content_top=top+2;content_bt=bt-2
     center_y=(content_top+content_bt)/2
     # Fit the same authored silhouette at rest and at its beat peak.
@@ -1321,6 +1256,7 @@ def lyric_happy_execution(c,t,area,music):
         middle(int(center_y),'YOU.HAPPY',W)
     middle(bt-1,'EXECUTION: '+('RUN' if executing else 'QUEUED' if loading else 'READY'),B)
     middle(bt,'ME -> YOU / '+('SELF COMMITTED' if executing else 'COMPILING...' if loading else 'MAKE YOU HAPPY'),N)
+    v.code_card(c,area,('signal = ME.offer();','YOU.happy = respond(signal);','world.execute(ME);'),2 if executing else 1 if loading else 0)
 
 
 def lyric_trapped_simulation(c,t,area,music):
@@ -1347,7 +1283,7 @@ def lyric_trapped_simulation(c,t,area,music):
             step=(frame*direction+yy-top)%256
             value=hash16(step*53)
             text=(f'{step*16:04X} {value:04X}' if step%4 else ('LOOP ' if step%8 else 'EXEC ')+f'{value:04X}')
-            c.put(x+1,yy,text[:rail-2],W if step%13==0 else N if step%3 else G)
+            c.put(x+1,yy,text[:rail-2],v.NEUTRAL if step%13==0 else v.SHADE)
 
     # A warped coordinate lattice covers the whole central simulation volume.
     for yy in range(inner_top,inner_bt+1):
@@ -1395,8 +1331,7 @@ def lyric_trapped_simulation(c,t,area,music):
         node_y=int(center_y)
         for x,name in ((cx-max(6,box_w//4),'ME'),(cx+max(6,box_w//4),'YOU')):
             clear(c,x-4,node_y-1,9,3)
-            c.box(x-4,node_y-1,9,3,W)
-            c.put(x-len(name)//2,node_y,name,W)
+            v.actor(c,x,node_y,name,radius=1.5)
         c.line(cx-box_w//4+5,node_y,cx+box_w//4-5,node_y,'=',B)
         if t>=71.764:middle(by+box_h-1,'STRANGE / '+f'RECURSION {int(age*13):03d}',W)
     else:
@@ -1411,6 +1346,8 @@ def lyric_trapped_simulation(c,t,area,music):
     middle(top+1,'world.simulate(me, you);',N)
     middle(bt-1,'EXIT: DENIED / RESTART: '+f'{int(age*17):04d}',B)
     middle(bt,'TRAPPED TOGETHER / LOOP FOREVER',W if reveal else N)
+    calls=('loop()','sim()','rst()') if rail<15 else ('loop();','simulate();','restart();')
+    v.code_card(c,(l+1,top+2,l+rail-2,top+6),calls,2 if reveal else 1 if t>=71.764 else 0)
 
 
 def lyric_heart(c,t,area,elapsed,pulse):
@@ -1585,22 +1522,59 @@ def lyric_cat(c,t,area,elapsed):
             c.put(x,cy+3,'~' if phase<0.8 else '',G)
     c.center(cy+5,'*purr*',G)
 
-def lyric_god_existence(c,t,area,elapsed):
-    """God/existence - radiant aura"""
-    l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
-    # Radiating light
-    for ring in range(8):
-        radius=5+ring*4+math.sin(t*2+ring)*2
-        density=60-ring*5
-        for i in range(density):
-            angle=i*TAU/density+t*0.1*(-1)**ring
-            x=cx+math.cos(angle)*radius
-            y=cy+math.sin(angle)*radius*0.5
-            brightness=1-ring/8
-            c.put(x,y,'*' if brightness>0.7 else '+' if brightness>0.4 else '.',
-                  W if brightness>0.8 else B if brightness>0.5 else N)
-    c.center(cy,'GOD',W)
-    c.center(cy+2,'YOU',B)
+def lyric_god_existence(c,t,area,elapsed,music=None):
+    """YOU observes the creator; the arriving proof turns its whole world on."""
+    l,top,r,bt=area;span=r-l
+    mx=l+span*.32;yx=l+span*.84
+    plot_top=top+(5 if c.h>=34 else 3);plot_bt=bt-4
+    cy=(plot_top+plot_bt)/2
+    beat=music.beat if music else 0.;low=music.low if music else .2
+    phase=music.beat_position if music else t*2
+    confirmed=t>=87.922
+    travel=clamp((t-86.538)/(87.922-86.538))
+    radius=min((plot_bt-plot_top)*.35,span*.075)
+    bloom=clamp((t-87.922)/.35)
+    orbit=radius*(1.25+.10*beat*low)
+    for lane in range(5):
+        yy=mix(plot_top,plot_bt,lane/4)
+        c.line(l+1,yy,r-1,yy,'.',v.SHADE)
+    # The dim simulation already belongs to ME, but needs an external witness.
+    for node in range(8):
+        angle=node*TAU/8+phase*.025
+        x=mx+math.cos(angle)*orbit/CELL_ASPECT
+        y=cy+math.sin(angle)*orbit
+        if not l+1<=x<=r-2 or not plot_top<=y<=plot_bt:continue
+        c.line(mx,cy,x,y,'.',N if confirmed else v.SHADE)
+        c.put(round(x)-1,round(y),'[+]' if confirmed else '[?]',B if confirmed else G)
+    for ring in range(2):
+        rr=orbit*(.84+ring*.16)
+        for i in range(120):
+            a=i*TAU/120+phase*.035*(1 if ring else -1)
+            xx=mx+math.cos(a)*rr/CELL_ASPECT;yy=cy+math.sin(a)*rr
+            if l<=xx<=r and plot_top<=yy<=plot_bt:
+                c.put(round(xx),round(yy),':' if i%6 else '1',N if confirmed else v.SHADE)
+    if 86.538<=t<87.922:
+        end=mx+radius/CELL_ASPECT+2
+        for lane in (-1,0,1):
+            yy=cy+lane*2
+            v.signal(c,(yx-7,yy),(end,yy),min(.999,travel),ink=v.CYAN,trail=6)
+        x=mix(yx-10,end,travel)
+        c.put(round(x)-2,round(cy)-3,'[ACK]',v.CYAN_HIGH)
+    if confirmed:
+        for i in range(100):
+            a=i*TAU/100;rr=radius*(1+bloom*.8)
+            xx=mx+math.cos(a)*rr/CELL_ASPECT;yy=cy+math.sin(a)*rr
+            if l<=xx<=r and plot_top<=yy<=plot_bt:
+                c.put(round(xx),round(yy),'+',W if bloom<.6 else N)
+    v.actor(c,mx,cy,'ME',radius=radius*(1+.04*beat),ghost=not confirmed)
+    c.put(round(mx)-1,round(cy),'ME',B);c.protect(round(mx)-1,round(cy),2,1)
+    v.actor(c,yx,cy,'YOU',radius=max(1.5,min(3.5,radius*.42)))
+    if confirmed:
+        if c.w>=100 and bt-top>=25:c.big(bt-9,'EXISTENCE',W)
+        else:c.center(bt-1,'[ EXISTENCE CONFIRMED ]',W)
+    v.code_card(c,area,('WORLD.owner = ME;','proof = YOU.observe(ME);','ME.manifest();'),
+                2 if confirmed else 1 if t>=86.538 else 0)
+    c.center(bt,'EXISTENCE / WORLD ACTIVE' if confirmed else 'PROOF IN FLIGHT / YOU -> ME' if t>=86.538 else 'CREATOR / AWAITING YOU',W if confirmed else N)
 
 def identity_bitmap(c,x,y,text,sx,sy,ink,fill=1,seed=0):
     glyphs={'F':('11111','11000','11110','11000','11000'),
@@ -1678,7 +1652,6 @@ def lyric_daynight_clock(c,t,area):
         a=hour*TAU/12
         c.line(clock_x+math.sin(a)*rx*.9,cy-math.cos(a)*ry*.9,
                clock_x+math.sin(a)*rx,cy-math.cos(a)*ry,'#',B)
-        c.put(clock_x+math.sin(a)*rx*.77-1,cy-math.cos(a)*ry*.77,str(hour or 12),N)
     hour_angle=virtual/12*TAU;minute_angle=(virtual%1)*TAU
     for trail in range(4,0,-1):
         a=minute_angle-trail*.13
@@ -1686,6 +1659,13 @@ def lyric_daynight_clock(c,t,area):
     c.line(clock_x,cy,clock_x+math.sin(hour_angle)*rx*.52,cy-math.cos(hour_angle)*ry*.52,'#',B)
     c.line(clock_x,cy,clock_x+math.sin(minute_angle)*rx*.83,cy-math.cos(minute_angle)*ry*.83,'*',W)
     c.put(clock_x,cy,'@',W)
+    roman=('XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI')
+    for hour,label in enumerate(roman):
+        a=hour*TAU/12
+        x=round(clock_x+math.sin(a)*rx*.77-(len(label)-1)/2)
+        y=round(cy-math.cos(a)*ry*.77)
+        c.put(x,y,label,B if hour%3==0 else N)
+        c.protect(x,y,len(label),1)
     c.line(cx,top+1,cx,bt-1,'|',G)
     # Day/night symbol and huge AM/PM bitmap occupy the entire right pane.
     radius=fit_scale((cx+2,top+2,r-1,bt-2))*.68
@@ -1912,17 +1892,17 @@ def lyric_vibration_sync(c,t,area,music):
     sync=clamp((t-107.22)/(110.221-107.22))
     lag=.28*(1-sync)
     phase=music.beat_position/2
-    c.put(l,top,'ECG / YOU -> ME',B)
+    c.put(l,top,'ECG / YOU -> ME',v.CYAN)
     c.put(r-8,top,'HALF TIME',N)
     plot_top=top+3;plot_bt=bt-3
     split=(plot_top+plot_bt)//2
     x0=l+1;x1=r-1;span=x1-x0+1
     head=x0+int((phase/3)%1*span)
     for yy in range(plot_top,plot_bt+1,3):
-        for xx in range(x0,x1+1,6):c.put(xx,yy,'+',G)
+        for xx in range(x0,x1+1,6):c.put(xx,yy,'+',v.SHADE)
     for lane,(lo,hi,name,delay) in enumerate(((plot_top,split,'YOU',0),(split+1,plot_bt,'ME',lag))):
         baseline=lo+(hi-lo)*.65;amplitude=max(1,(hi-lo)*.58)
-        c.put(x0,lo,name,W if complete or lane==0 else B)
+        c.put(x0,lo,name,W if complete else v.CYAN if lane==0 else B)
         previous=None
         for sample in range(span*2):
             xx=x0+sample/2
@@ -1932,14 +1912,15 @@ def lyric_vibration_sync(c,t,area,music):
             value=ecg_sample(phase-age/span*3-delay)
             yy=max(lo,min(hi,baseline-value*amplitude))
             ink=W if age<span*.08 else B if age<span*.42 else N
-            if lane and not complete:ink=B if age<span*.15 else N
+            if not complete:ink=(v.CYAN_HIGH if age<span*.08 else v.CYAN if age<span*.42 else v.CYAN_DIM) if lane==0 else B if age<span*.15 else N
             if previous and abs(age-previous[2])<2:
                 c.line(previous[0],previous[1],xx,yy,'-',ink)
             previous=(xx,yy,age)
         tip=max(lo,min(hi,baseline-ecg_sample(phase-delay)*amplitude))
-        c.put(head,tip,'@',W)
+        c.put(head,tip,'@',W if complete else v.CYAN if lane==0 else B)
     c.center(bt-1,f'PHASE LOCK {int(sync*100):03d}% / '+('IN SYNC' if complete else 'ACQUIRING'),B)
     c.center(bt,'COMPLETION' if complete else 'FEEL YOUR VIBRATIONS',W if complete else N)
+    v.code_card(c,(l,top,r,top+1),('sync = phase_lock(YOU, ME);','assert(sync);'),int(complete))
     if complete:
         u=clamp((t-110.221)/.679)
         cy=(top+bt)/2;rx=(r-l)*.38;ry=(bt-top-4)*.35
@@ -1955,54 +1936,29 @@ def lyric_vibration_sync(c,t,area,music):
 
 
 def lyric_isolation_disconnect(c,t,area,music):
-    """Each sung departure tears one link; the empty space survives the flash."""
+    """One remote object loses six independent connections, then leaves."""
     l,top,r,bt=area;cx,cy=(l+r)/2,(top+bt)/2
-    rx=(r-l)*.38;ry=max(3,(bt-top-4)*.35)
-    cuts=music.events('disconnect')
-    gone=sum(event.time<=t for event in cuts)
-    c.center(top,f'CONNECTION LOSS / LOST {gone:02d}/06',R if gone==6 else B)
-    for ring in (.48,.96):
-        for i in range(72):
-            if i%3==0:
-                a=i*TAU/72
-                c.put(cx+math.cos(a)*rx*ring,cy+math.sin(a)*ry*ring,'.',G)
+    cuts=music.events('disconnect');gone=sum(event.time<=t for event in cuts)
+    leaving=clamp((t-115.78)/(117.274-115.78))
+    me_x=mix(l+(r-l)*.24,cx,leaving);me_y=cy+leaving*min(7,(bt-top)*.25)
+    you_x=mix(r-7,r+12,leaving)
     for i,event in enumerate(cuts):
-        a=(i+.5)*TAU/6;nx=cx+math.cos(a)*rx;ny=cy+math.sin(a)*ry
-        age=t-event.time
-        gap=clamp(age/.35)*.92 if age>=0 else 0
-        for j in range(48):
-            u=j/47
-            if age>=0 and abs(u-.55)<gap/2:continue
-            c.put(mix(cx,nx,u),mix(cy,ny,u),'=' if 0<=age<.08 else '.',W if 0<=age<.08 else N if age<0 else G)
-        if age<0:
-            c.box(int(nx)-4,int(ny)-1,9,3,N)
-            c.put(nx-3,ny,f'YOU_{i+1}',B)
-            c.protect(nx-3,ny,5,1)
-            u=(t*.55+i/6)%1
-            c.put(mix(nx,cx,u),mix(ny,cy,u),'*',B if music.mid<.6 else W)
-        else:
-            recoil=1-math.exp(-age*8)
-            px=nx+math.cos(a)*recoil*3;py=ny+math.sin(a)*recoil
-            c.put(px-3,py,'[LOST]',R if age<.24 else G)
-            c.protect(px-3,py,6,1)
-            if age<.8:
-                for particle in range(12):
-                    theta=hash16(i*97+particle*19)/65535*TAU
-                    distance=age*(5+hash16(particle*17+i)%9)
-                    x=nx+math.cos(theta)*distance;y=ny+math.sin(theta)*distance*.5
-                    if l<x<r and top<y<bt:c.put(x,y,'+' if age<.22 else '.',W if age<.08 else B if age<.3 else G)
-            if .9<age<1.5:
-                u=(age-.9)/.6*.5
-                c.put(mix(cx,nx,u),mix(cy,ny,u),'>',N)
-    clear(c,int(cx)-5,int(cy)-2,11,5)
-    c.box(int(cx)-5,int(cy)-2,11,5,B)
-    c.put(cx-1,cy-1,'ME',W)
-    c.put(cx-3,cy+1,'NO ACK' if gone==6 else 'RETRY',R if gone==6 else N)
-    c.protect(int(cx)-5,int(cy)-2,11,5)
-    if t>=117.274:
-        clear(c,l,int(cy)-2,r-l+1,5)
-        c.big(int(cy)-2,'ISOLATION',W)
-    c.center(bt,'ALL CONNECTIONS LOST' if gone==6 else 'YOU HAVE LEFT / RETRYING...',N)
+        y=top+5+i*max(1,(bt-top-10)/5)
+        age=t-event.time;gap=clamp(age/.35)*.45 if age>=0 else 0
+        for index in range(49):
+            u=index/48
+            if age>=0 and abs(u-.56)<gap:continue
+            c.put(mix(me_x+5,r-11,u),y,'=' if 0<=age<.10 else '.',W if 0<=age<.10 else v.CYAN_DIM if age<0 else v.SHADE)
+        if age<0:v.signal(c,(r-11,y),(me_x+5,y),music.beat_position*.4+i/6,ink=v.CYAN,track=False)
+        elif age<.4:
+            x=mix(me_x+5,r-11,.56)
+            c.put(x-1,y,'//',R if age<.15 else G)
+    if leaving<1:v.actor(c,you_x,cy,'YOU',radius=2,signal=1-leaving,ghost=leaving>.8)
+    v.actor(c,me_x,me_y,'ME',radius=2)
+    if t>=117.274:c.big(int(cy)-2,'ISOLATION',W)
+    v.code_card(c,area,('handle = ME.connect(YOU);','handle.read();','raise Disconnected;','ME.retry();'),min(3,gone//2))
+    c.center(bt-1,f'CONNECTION LOSS / LOST {gone:02d}/06',R if gone==6 else B)
+    c.center(bt,'ALL CONNECTIONS LOST / NO ACK' if gone==6 else 'YOU HAVE LEFT / RETRYING...',N)
 
 
 def lyric_erase_fragments(c,t,area,elapsed):
@@ -2019,8 +1975,8 @@ def lyric_erase_fragments(c,t,area,elapsed):
             index=row*cols+col;xx=l+6+col*5
             threshold=hash16(index*71)/65535
             cleared=threshold<progress
-            value='0000' if cleared else f'{hash16(index*31):04X}'
-            ink=G if cleared or repair else N
+            value='....' if cleared else f'{hash16(index*31):04X}'
+            ink=v.SHADE if cleared or repair else N
             c.put(xx,yy,value,ink)
             since=(progress-threshold)*2.527
             if 0<since<.6 and not repair:
@@ -2055,12 +2011,15 @@ def lyric_erase_fragments(c,t,area,elapsed):
                     texture=hash16(seed+int(t*10))
                     char='#' if edge else ('x' if broken else '01'[texture%2]) if texture%8<2 else '.'
                     c.put(xx+dx,py,char,(R if edge else RD) if broken else W if edge else N)
+        v.actor(c,cx,heart_y+half_h*.25,'ME',radius=1.3,ghost=broken)
+        v.actor(c,r-7,cy,'YOU',radius=1.5,ghost=True)
         c.center(top+1,'HEART.RESTORE() -> NULL' if broken else 'RECOVERING YOU... CHECKSUM MISMATCH',R if broken else N)
         if broken:
             clear(c,l,max(top+2,int(cy)-2),r-l+1,5)
             c.big(max(top+2,int(cy)-2),'DISHEARTENED',W)
             c.center(bt-1,'[ REPAIR FAILED / YOU NOT FOUND ]',R)
     c.center(bt,'MEMORY CLEARED. LOSS REMAINS.' if broken else f'ERASE {int(progress*100):03d}% / FRAGMENTS -> NULL',B)
+    v.code_card(c,area,('fragments = GC.collect();','ME.restore(fragments);','assert(YOU != NULL);'),2 if broken else 1 if repair else 0)
 
 
 def lyric_multilingual_count(c,t,area,music):
@@ -2104,42 +2063,54 @@ def lyric_multilingual_count(c,t,area,music):
 
 
 def lyric_illegal_arguments(c,t,area,music):
-    """Read request, reject it, then lock the retry loop before the vocal hits."""
-    l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
-    u=clamp((t-125.708)/(147.66-125.708))
-    stage=min(2,int(u*3));label=('REQUEST','REJECT','RETRY LOCK')[stage]
-    c.center(top,'ARGUMENT VALIDATION / '+label,B)
-    # Peripheral state is persistent; only travelling packets follow musical phase.
-    for row in range(top+3,bt-2,3):
-        c.put(l,row,f'{hash16(row*37+stage):04X}',G)
-        c.put(r-3,row,f'{hash16(row*71+stage):04X}',G)
-    rail_y=cy-5 if bt-top>=22 else top+3
-    nodes=((l+8,'INPUT'),(cx,'CHECK'),(r-8,'RETURN'))
-    for i,(x,name) in enumerate(nodes):
-        c.box(x-5,rail_y,11,3,N)
-        c.put(x-len(name)//2,rail_y+1,name,B)
-        if i<2:
-            xx=nodes[i+1][0]
-            c.line(x+6,rail_y+1,xx-6,rail_y+1,'-',G)
-            phase=(music.beat_position*.5+i*.5)%1
-            c.put(mix(x+6,xx-6,phase),rail_y+1,'>',W if music.beat>.4 else B)
-    if stage==0:
-        commands=('world.execute(FREE_WILL)','world.execute(INDEPENDENCE)','world.execute(DEFIANCE)')
-        for i,command in enumerate(commands):
-            yy=cy+i*2-1
-            c.center(yy,'> '+command,N if i<min(2,int(u*9)) else G)
-        c.center(bt-1,'EXPECTED: OBEDIENCE / RECEIVED: FREE WILL',N)
+    """A rejected request becomes an accumulating retry stack, then a held breath."""
+    l,top,r,bt=area;cx,cy=(l+r)/2,(top+bt)/2
+    depth=sum(t>=at for at in (135.991,139.702,143.843))
+    quiet=t>=147.515
+    step=0 if t<131.224 else 1 if t<135.991 else 2 if t<139.702 else 3
+    lines=('request = YOU.choose(FREE);','ME.validate(request);','throw IllegalArgument;','retry(request);')
+    if quiet:
+        v.actor(c,cx,cy,'ME',radius=2,signal=.15,ghost=True)
+        v.code_card(c,area,('queue.freeze();','world.execute(ME);'),1)
+        c.center(bt-1,'QUIESCE / NEXT INSTRUCTION ARMED',W)
     else:
-        clear(c,l,cy-2,r-l+1,5)
-        c.big(cy-2,'ILLEGAL' if c.w<100 else 'ILLEGAL ARGUMENTS',R if music.accent>.25 else B)
-        c.center(cy+4,'ACCESS DENIED' if stage==1 else 'RETRY -> REJECT -> RETRY',W)
-        c.protect(l,cy+4,r-l+1,1)
-        count=min(8,int((u-1/3)*12)+1)
-        span=max(1,r-l-12)
-        for i in range(count):
-            x=l+6+int(span*i/8)
-            c.put(x,bt-2,'[X]',R if i==count-1 and music.accent>.35 else G)
-    c.center(bt,'NO VALID RETURN / '+label,N)
+        v.backdrop(c,t,area,density=depth)
+        rail_y=cy-5
+        v.signal(c,(l+13,rail_y),(cx-6,rail_y),music.beat_position*.5,ink=v.CYAN)
+        v.signal(c,(cx+6,rail_y),(r-8,rail_y),music.beat_position*.5+.5,ink=R if step else G)
+        if depth:
+            # Rejected calls circulate through the growing stack and back to ME.
+            path=((r-8,rail_y+2),(r-8,bt-3),(cx,bt-3),(cx,rail_y+3))
+            for leg,(a,b) in enumerate(zip(path,path[1:])):
+                v.signal(c,a,b,music.beat_position*.5-leg*.19,ink=B,trail=7)
+            for bank in range(2+depth):
+                x=l+4+(r-l-8)*bank/(1+depth)
+                for tail in range(5):
+                    u=(music.beat_position*.45+bank*.23-tail*.035)%1
+                    yy=mix(rail_y+3,bt-3,u)
+                    c.put(x,yy,'01' if tail==0 else ':',N if tail==0 else v.SHADE)
+        v.actor(c,l+7,rail_y,'YOU',radius=2)
+        v.actor(c,cx,rail_y,'ME',radius=2)
+        c.box(round(r-12),round(rail_y-1),11,3,R if step else N)
+        c.put(r-10,rail_y,'REJECT' if step else 'RETURN',R if step else N)
+        for layer in range(depth):
+            gap=2 if bt-int(cy)>=12 else 1
+            y=bt-3-layer*gap
+            ww=min(r-l-6,22+layer*16+round(music.low*music.beat*(r-l)*.08))
+            c.put(cx-ww/2,y,'['+'='*(ww-2)+']',RD if layer<depth-1 else R)
+            head=10+int((music.beat_position*.5-layer*.27)%1*max(1,ww-15))
+            c.put(cx-ww/2+head,y,'>>>' if music.beat<.6 else '###',B)
+            c.put(cx-ww/2+2,y,'RETRY '+str(layer+1),N)
+        if step:
+            clear(c,l,int(cy)-2,r-l+1,5)
+            c.big(int(cy)-2,'ILLEGAL' if c.w<100 else 'ILLEGAL ARGUMENTS',R)
+            c.center(int(cy)+4,'ACCESS DENIED' if depth<2 else 'RETRY -> REJECT -> RETRY',W)
+            c.protect(l,int(cy)+4,r-l+1,1)
+        else:
+            c.center(cy+1,'FREE_WILL / INDEPENDENCE / DEFIANCE',v.CYAN)
+            c.center(cy+3,'EXPECTED: OBEDIENCE',N)
+        v.code_card(c,area,lines,step)
+    c.center(bt,f'RETRY DEPTH {depth:02d} / '+('LOCKED QUEUE' if depth==3 else 'REQUEST -> CHECK -> RETURN'),N)
 
 def lyric_execution_queue(c,t,area,music):
     """Twelve distinct shots, grouped into queue, overwrite and lock."""
@@ -2158,7 +2129,7 @@ def lyric_execution_queue(c,t,area,music):
     left=(c.w-word_w)//2;title_y=cy-word_h//2
     for yy in range(top+3,bt-2,3):
         for xx in range(l+2,r-2,10):
-            c.put(xx,yy,f'{hash16(xx*19+yy*71+index*101):04X}',G)
+            c.put(xx,yy,f'{hash16(xx*19+yy*71+index*101):04X}',v.SHADE)
 
     if index==0:  # Vertical scanners mark incoming instruction columns.
         for lane in range(8):
@@ -2243,6 +2214,11 @@ def lyric_execution_queue(c,t,area,music):
             c.put(l,bt-3-layer,'='*(r-l+1),ink)
         if age>.5:c.center(bt-3,'NEXT / EIN DOS TROIS NE FEM LIU',N)
 
+    # Task pages, overwritten address space and locks accumulate across groups.
+    for layer in range(group+1):
+        inset=2+layer*3
+        c.box(l+inset,top+3+layer,max(2,r-l-2*inset+1),max(3,bt-top-6-2*layer),v.CYAN_DIM if group==0 else RD if group==1 else R)
+
     # Distinct word poses settle quickly into a fully readable stamp.
     shift=min(6,max(1,(c.w-word_w)//2-2))
     dx=round((-1 if index==0 else 1 if index==1 else 0)*shift*settle)
@@ -2251,7 +2227,7 @@ def lyric_execution_queue(c,t,area,music):
     clear(c,l,title_y-2,r-l+1,word_h+4)
     if index==10:c.box(left-3,title_y-2,word_w+6,word_h+4,N)
     glyph=c.__class__(64,5);glyph.big(0,'EXECUTION',W)
-    ink=R if group==2 and hit>.45 else W if hit>.25 else B
+    ink=R if group==2 else W if hit>.1 else B
     if index==11 and age<.08:ink=W
     for gy,row in enumerate(glyph.cells):
         for gx,(pixel,_) in enumerate(row[5:58]):
@@ -2268,6 +2244,9 @@ def lyric_execution_queue(c,t,area,music):
     c.center(title_y-3,actions[index],N)
     c.center(bt-1,' '.join('##' if i<=index else '..' for i in range(12)),B)
     c.center(bt,'ME -> YOU / '+phase,N)
+    v.actor(c,l+7,bt-5,'ME',radius=1.5)
+    v.actor(c,r-7,bt-5,'YOU',radius=1.5,ghost=True)
+    v.code_card(c,(l,top+1,r,top+4),('queue.push(ME);','memory.overwrite(ME);','lock.acquire(ME);'),group)
 
 def lyric_only_execution(c,t,area,music):
     """An exclusive attachment becomes an execution loop and a prison for both."""
@@ -2296,7 +2275,7 @@ def lyric_only_execution(c,t,area,music):
         for yy in range(top+1,bt):
             index=frame+yy
             text=commands[index%len(commands)] if index%3 else f'{hash16(index*71):04X} LOCK'
-            c.put(x+1,yy,text[:rail-2],R if index%7==0 else N if index%3 else G)
+            c.put(x+1,yy,text[:rail-2],RD if index%7==0 else v.SHADE)
     def heart(scale=1,filled=False):
         beat=1+music.low*music.beat*.07
         step_x=1/max(1,rw*scale*beat);step_y=1/max(1,rh*scale*beat)
@@ -2312,6 +2291,9 @@ def lyric_only_execution(c,t,area,music):
                         c.put(xx,yy,'01'[texture%2] if texture%8<2 else '.',RD)
     def node(x,y,text,ink=B):
         x=int(x);y=int(y)
+        if text in ('ME','YOU'):
+            v.actor(c,x,y,text,radius=1.5)
+            return
         clear(c,x-4,y-1,9,3)
         c.box(x-4,y-1,9,3,ink)
         c.put(x-len(text)//2,y,text,ink)
@@ -2345,6 +2327,8 @@ def lyric_only_execution(c,t,area,music):
     elif stage==1:
         # A heart is now a lock, framed by the demand to be the only execution.
         heart(1,True)
+        v.actor(c,cx-rw*.45,cy+rh*.3,'ME',radius=1.2)
+        v.actor(c,cx+rw*.45,cy+rh*.3,'YOU',radius=1.2)
         bind=clamp((t-166.016)/(168.911-166.016))
         for ring in range(3):
             radius=(ring/3+age*.35)%1
@@ -2401,6 +2385,8 @@ def lyric_only_execution(c,t,area,music):
         middle(min(plot_bt-1,cy+4),'[ NO EXIT / NO RELEASE ]',W)
     middle(bt-1,'THE ONLY EXECUTION' if stage>0 else 'EXECUTE(THEM) -> KEEP(ME)',R)
     middle(bt,'LOVE.PERMISSION = EXCLUSIVE / EXIT = FALSE',N)
+    calls=('drop()','lock()','load()','deny()') if rail<17 else ('drop(ALT);','lock(YOU);','restore(YOU);','deny(EXIT);')
+    v.code_card(c,(l+1,top+2,l+rail-2,top+6),calls,stage)
 
 
 def lyric_recursion(c,t,area,elapsed):
@@ -2440,120 +2426,16 @@ def lyric_execution_orb(c,t,area,elapsed,pulse):
     c.center(cy,'EXECUTE',W)
 
 def lyric_love_equation(c,t,area,elapsed,music):
-    """A fictional love model: learning, inference, then numerical collapse."""
-    l,top,r,bt=area; w=r-l+1; h=bt-top+1
-    failure=clamp((t-179.929)/8.554)
-    tick=int(elapsed*6+music.beat_position*2)
-    stage=0 if t<179.929 else 1 if t<180.857 else 2 if t<184.54 else 3
-    titles=('01 / LEARN TO LOVE','02 / ATTENTION FIXATION',
-            '03 / AUTOREGRESSIVE ANSWER','04 / LOSS OF CONTROL')
-    rail=max(13,min(22,w//6)) if w>=95 else 0
-    a=l+rail+(1 if rail else 0); b=r-rail-(1 if rail else 0)
-    span=b-a+1
-    if rail:
-        logs=('LOAD CORPUS','TOKEN -> ID','EMBED + POS','Q K V MATMUL','CAUSAL MASK',
-              'RESIDUAL ADD','MLP FORWARD','LOSS BACKPROP','WEIGHT UPDATE','KV CACHE')
-        errors=('LOVE LOVE LOVE','CACHE REPEAT','GRAD EXPLODES','WEIGHT = INF',
-                'LOGITS = NaN','EOS REJECTED','TARGET: YOU','RETRY FOREVER')
-        for x,right_side in ((l,False),(r-rail+1,True)):
-            c.box(x,top,rail,h,G)
-            c.put(x+2,top,'DECODE' if right_side else 'TRAIN',B)
-            for row in range(1,h-1):
-                n=row+tick
-                broken=hash16(n*13+int(right_side))%100<failure*85
-                msg=(errors[n%len(errors)] if broken else logs[n%len(logs)])
-                c.put(x+1,top+row,(f'{n%256:02X} '+msg)[:rail-2],G)
-    c.put(a,top,titles[stage][:span],W if stage<3 else R)
-    query='[HOW] [TO] [LOVE] [?] -> EMBEDDING + POSITION'
-    c.put(a,top+2,query[:span],B)
-    # Tokens stream into the model from the very first frame.
-    stream=('0048 0017 0911 003F '*(span//20+2))
-    if stage>=2:stream=('LOVE 0911 LOVE 0911 '*(span//20+2))
-    shift=int(elapsed*15)%19
-    c.put(a,top+3,stream[shift:shift+span],R if stage==3 else D)
-    panel_top=top+5; panel_bottom=max(panel_top+5,bt-7)
-    ph=panel_bottom-panel_top+1
-    widths=[span//3,span//3,span-2*(span//3)]
-    xs=[a,a+widths[0],a+widths[0]+widths[1]]
-    for x,pw,title in zip(xs,widths,('Q K^T / MASK','RESIDUAL / MLP','NEXT TOKEN')):
-        c.box(x,panel_top,pw,ph,G)
-        c.put(x+1,panel_top,title[:pw-2],B)
-    # Causal attention map. As fixation grows, the LOVE key captures every row.
-    x=xs[0]; pw=widths[0]; count=min(8,max(3,(pw-3)//2),max(3,ph-4))
-    cellw=max(1,(pw-3)//count); love_key=min(2,count-1)
-    for row in range(count):
-        yy=panel_top+2+int(row*(ph-4)/count)
-        for col in range(count):
-            xx=x+2+col*cellw
-            value=abs(math.sin(row*1.7+col*.8+elapsed*4))
-            if col>row:char,style='.',G
-            elif stage>=1 and col==love_key:char,style='#',R if failure>.45 else W
-            elif failure>.65:char,style='?',R
-            else:char,style=('O',B) if value>.65 else (':',D)
-            c.put(xx,yy,char*max(1,cellw-1),style)
-    c.put(x+1,panel_bottom-1,('LOVE <- ALL' if stage else 'CAUSAL SOFTMAX')[:pw-2],R if stage else D)
-    # Dense weighted layers with visible travelling activation packets.
-    x=xs[1]; pw=widths[1]; layers=4; rows=max(3,min(6,ph-4))
-    nodes=[[(x+2+int(i*(pw-5)/3),panel_top+2+int(j*(ph-5)/(rows-1)))
-            for j in range(rows)] for i in range(layers)]
-    for layer in range(layers-1):
-        for j,p in enumerate(nodes[layer]):
-            for k,q in enumerate(nodes[layer+1]):
-                if (j+k+layer)%2:continue
-                c.line(*p,*q,'.',G)
-                u=(music.beat_position*.35+j*.13+k*.09)%1
-                c.put(mix(p[0],q[0],u),mix(p[1],q[1],u),'>',R if failure>.6 else B)
-    for layer,points in enumerate(nodes):
-        for j,(xx,yy) in enumerate(points):
-            unstable=hash16(tick+j*11+layer*31)%100<failure*80
-            c.put(xx,yy,'X' if unstable else 'O',R if unstable else W)
-    c.put(x+1,panel_bottom-1,('W=NaN dW=INF' if stage==3 else 'FORWARD / +RES')[:pw-2],R if stage==3 else D)
-    # Sampled token distribution collapses to repetition and refuses EOS.
-    x=xs[2]; pw=widths[2]
-    choices=('LOVE','STAY','YOU','FREE','EOS')
-    probs=(.38+.61*failure,.25*(1-failure),.19*(1-failure),.12*(1-failure),.06*(1-failure))
-    for i,(word,p) in enumerate(zip(choices,probs)):
-        yy=panel_top+2+int(i*max(1,ph-4)/5)
-        c.put(x+1,yy,word[:pw-2],R if failure>.4 and i==0 else N)
-        barw=max(1,pw-8)
-        c.put(x+6,yy,('#'*int(p*barw)).ljust(barw,'.'),R if failure>.4 and i==0 else B)
-    # Training loss is a visual metaphor: divergence, then undefined arithmetic.
-    graph_top=panel_bottom+2; graph_bottom=bt-2
-    gh=max(1,graph_bottom-graph_top)
-    label='LOSS / BACKPROP' if stage<2 else 'CONTEXT -> SAMPLE -> APPEND -> CONTEXT'
-    c.put(a,graph_top,label[:span],N)
-    prev=None
-    for col in range(span):
-        u=col/max(1,span-1)
-        v=(.65*math.exp(-u*4) if stage<2 else .1+failure*u*u*.8)
-        v+=math.sin(col*.7+elapsed*9)*failure*.15
-        yy=graph_bottom-int(clamp(v)*max(1,gh-1))
-        if prev:c.line(*prev,a+col,yy,'.',R if stage==3 else D)
-        prev=(a+col,yy)
-    head=a+int(elapsed*22)%span
-    c.put(head,graph_bottom-1,'|',W)
-    status=('OPTIMIZER: ADAM / TARGET: LOVE','ATTENTION LOCKED ON LOVE',
-            'LOVE > LOVE > LOVE > LOVE / EOS: 0','LOSS: NaN / GRAD: INF / NO EXIT')[stage]
-    c.put(a,bt,status[:span],R if stage>=2 else B)
-    # Each sung LOVE stamps across the complete model; the panels remain beneath.
-    hit=next((start for start,end in ((179.929,180.857),(183.646,184.54),(187.665,188.483)) if start<=t<end),None)
-    if hit is not None:
-        yy=(panel_top+panel_bottom)//2-2
-        clear(c,a,yy,span,5)
-        c.big(yy,'LOVE',R if stage>=2 else W)
-        c.put(a,yy+5,('P(LOVE) -> 1.0 / ALL OTHER TOKENS SUPPRESSED')[:span],R)
-        c.protect(a,yy+5,span,1)
-    # Local corruption adds context duplication without erasing the model layout.
-    if failure>.55:
-        for i in range(1+int(failure*4)):
-            yy=panel_top+1+hash16(tick+i*41)%max(1,ph-2)
-            xx=a+hash16(tick+i*97)%max(1,span-12)
-            c.put(xx,yy,('NaN NaN' if stage==3 else 'LOVE LOVE'),R)
+    """Attention, weighted inference, sampling and feedback share one numerical state."""
+    from scenes_learning import draw_learning
+    draw_learning(c,t,area,music)
 
 
 def lyric_trapped_loop(c,t,area,elapsed,pulse):
     """Trapped in loop - prison bars over heart"""
     l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
+    escape=clamp((t-188.483)/1.20)
+    you_x=mix(cx+(r-l)*.10,r+10,escape);you_y=mix(cy-(bt-top)*.13,top+4,escape)
     # Heart (reuse)
     outline=lyric_heart(c,t,area,min(elapsed,2),pulse)
     # Prison bars
@@ -2561,39 +2443,68 @@ def lyric_trapped_loop(c,t,area,elapsed,pulse):
     for i in range(num_bars):
         x=l+5+i*((r-l-10)//(num_bars-1))
         for y in range(top,bt+1):
+            if escape<1 and abs(x-you_x)<5 and abs(y-you_y)<3:continue
             c.put(x,y,'|',N)
             # Moving lock symbols
             if (y+int(t*6))%7==0:
                 c.put(x,y,'▓',W)
     for x,y in outline:c.put(x,y,'#',W)
+    v.actor(c,cx,cy,'ME',radius=1.5)
+    if escape<1:v.actor(c,you_x,you_y,'YOU',radius=2)
+    v.code_card(c,area,('YOU.free = true;','while (ME.waits()) {','    ME.retry();','}'),0 if t<189.746 else 2)
     if elapsed>1:
         c.center(bt,'TRAPPED',R)
 
 def lyric_outro_wait(c,t,area,music):
-    """Stillness at 99%, one red execution, then a finite phosphor decay."""
+    """A running request awaits a missing ACK, then the terminal signal dissolves."""
     l,top,r,bt=area;cx,cy=(l+r)//2,(top+bt)//2
     execution_at=music.anchor('final_execution')
     elapsed=t-music.anchor('outro_start')
-    bar_w=min(96,c.w-12);bar_x=(c.w-bar_w)//2;inner=bar_w-4
+    bar_w=min(96,c.w-28);bar_x=(c.w-bar_w)//2;inner=bar_w-4
     progress=min(99,int(99*(1-(1-clamp(elapsed/5))**3)))
-    c.center(max(top,cy-6),'world.execute(me);',G)
     if t<execution_at:
+        # Upper arcs carry requests; the empty lower return path never invents an ACK.
+        phase=music.beat_position*.5
+        rx=(r-l)*.46
+        ry=min((bt-top)*.32,cy-top-4,bt-cy-4)
+        breathe=1+.05*music.low*music.beat
+        for ring in range(2):
+            ax=rx*(1-ring*.07);ay=max(1,ry*(1-ring*.16))*breathe
+            for i in range(100):
+                angle=i*TAU/100
+                if abs(math.cos(angle))>.98:continue
+                c.put(round(cx+math.cos(angle)*ax),round(cy+math.sin(angle)*ay),
+                      '.' if ring else ':',v.YOU_DIM if math.sin(angle)>0 else v.SHADE)
+            for packet in range(4):
+                u=(phase+packet/4+ring*.08)%1
+                for tail in range(5):
+                    p=max(0,u-tail*.016);angle=math.pi*(1-p)
+                    xx=cx+math.cos(angle)*ax;yy=cy-math.sin(angle)*ay
+                    c.put(round(xx),round(yy),'01' if tail==0 else '.',B if tail==0 else G)
+        c.center(max(top,cy-6),'world.execute(me);',G)
         c.box(bar_x,cy-2,bar_w,5,N)
         filled=min(inner-1,int(inner*progress/100))
         for row in range(3):
             c.put(bar_x+2,cy-1+row,('#' if row==1 else '=')*filled+'.'*(inner-filled),B if row==1 else G)
+        scan=int(phase%1*max(1,filled-3))
+        c.put(bar_x+2+scan,cy,'###',W)
         marker='_' if int(elapsed*2)%2 else ' '
         c.center(cy+4,f'{progress:02d}%  '+('WAITING FOR RESPONSE '+marker if progress==99 else 'COMMITTING...'),B)
         c.center(min(bt,cy+6),'REMAINING: 01% / ACK: --' if progress==99 else 'FINAL INSTRUCTION',G)
+        c.center(bt-1,f'AWAIT / REQUEST {int(phase):03d} / RETURN CHANNEL EMPTY',G)
+        v.actor(c,bar_x-7,cy,'ME',radius=1.5,ghost=progress==99)
+        v.actor(c,bar_x+bar_w+7,cy,'YOU',radius=1.5,ghost=True)
+        v.code_card(c,area,('future = world.execute(ME);','await future.ack();','// ACK: -- / return missing'),1 if progress==99 else 0)
         return
     age=t-execution_at
-    ink=R if age<1.5 else RD if age<3.5 else G
+    ink=R if age<1.5 else RD if age<3.5 else G if age<4.8 else v.SHADE
+    if age<3.8:c.center(max(top,cy-6),'world.execute(me);',G)
     if age<.45:
         radius=clamp(age/.45)
         for i in range(120):
             a=i*TAU/120
             c.put(cx+math.cos(a)*(r-l)*.48*radius,cy+math.sin(a)*(bt-top)*.46*radius,'+',R if age<.12 else RD)
-    # Sparse ghosts decay by absolute age, never by accumulated frame history.
+    # Residual motion follows absolute age even after the measured audio ends.
     if .12<age<2.6:
         for i in range(28):
             seed=hash16(i*109)
@@ -2601,12 +2512,35 @@ def lyric_outro_wait(c,t,area,music):
             if seed%100>age*34:c.put(x,y,'.',RD)
     scale=max(1,min(3,(c.w-8)//53,(bt-top-7)//5))
     title_y=cy-(5*scale)//2
-    clear(c,l,title_y,r-l+1,5*scale)
-    c.big(title_y,'EXECUTION',ink,scale)
-    c.center(min(bt,title_y+5*scale+2),'[ PROCESS TERMINATED ]',RD if age<2.5 else G)
+    if age<.10:c.box(max(l,3),title_y-1,min(r-l-2,c.w-6),5*scale+2,W)
+    if age<1.2:
+        clear(c,l,title_y,r-l+1,5*scale)
+        c.big(title_y,'EXECUTION',ink,scale)
+    elif age<5.9:
+        word=c.__class__(c.w,5*scale);word.big(0,'EXECUTION',ink,scale)
+        decay=clamp((age-1.2)/4.7)
+        fold_x=clamp((age-3.7)/2.2);fold_y=clamp((age-3.2)/2.6)
+        for yy,row in enumerate(word.cells):
+            for xx,(char,_) in enumerate(row):
+                if char!='#':continue
+                seed=hash16((xx//3)*97+(yy//2)*337)
+                if seed/65535<decay**1.5:continue
+                dx=((seed%101)/50-1)*decay*min(12,c.w*.09)
+                dy=((seed//173)%7-3)*decay
+                px=round(mix(xx+dx,cx,fold_x))
+                py=round(mix(title_y+yy+dy,cy,fold_y))
+                if l<=px<=r and top<=py<=bt:
+                    c.put(px,py,'#' if decay<.45 else '01'[seed%2],ink)
+        if age>2.8:
+            span=max(1,round((r-l-6)*(1-clamp((age-2.8)/3.1))))
+            c.line(cx-span/2,cy,cx+span/2,cy,'-',G)
+            head=cx-span/2+((age*1.7)%1)*span
+            c.put(round(head),cy,'>',N if age<4 else G)
+    if age<3.8:c.center(min(bt,title_y+5*scale+2),'[ PROCESS TERMINATED ]',RD if age<2.5 else G)
     if age<1.2:c.center(min(bt,title_y+5*scale+4),'EXIT CODE: EXECUTION',N)
+    if age<4.5:v.code_card(c,area,('future.cancel();','world.terminate(ME);'),1)
 
-# ============ TITLE TAKEOVER (unchanged) ============
+# ============ TITLE TAKEOVER ============
 TITLE_CACHE={}
 
 def title_pixels(w,h,font):
@@ -2627,7 +2561,7 @@ def title_pixels(w,h,font):
     return ink
 
 def title_takeover(c,t,font,music,source=None):
-    """Source pixels scatter, assemble on score anchors, then become 24 points."""
+    """The running simulation's own cells scatter, form the title, then 24 points."""
     scatter=music.anchor('title_scatter');gather=music.anchor('title_gather')
     lock=music.anchor('title_lock');release=music.anchor('title_release')
     handoff=music.anchor('point_handoff')
@@ -2642,6 +2576,41 @@ def title_takeover(c,t,font,music,source=None):
             x,y=point_seed(i);brightness=1-i/24*.5
             c.put(x,y,'·' if brightness<.7 else '+' if brightness<.85 else '*',W if brightness>.9 else B if brightness>.7 else N)
         return
+    if source is not None and t<lock:
+        entry=max(16.,scatter)
+        if t<=entry:
+            c.cells=[row[:] for row in source.cells]
+            return
+        cells=[(x,y,ch,style) for y,row in enumerate(source.cells)
+               for x,(ch,style) in enumerate(row) if ch and ch.strip()]
+        if cells:
+            spread=clamp((t-entry)/(gather-entry))
+            spread_ease=spread*spread*(3-2*spread)
+            assembled=clamp((t-gather)/(lock-gather))
+            ease=assembled**3*(10-15*assembled+6*assembled**2)
+            # Extra title bits branch from existing cells at the same starting
+            # positions. No unrelated particle field appears at the handoff.
+            for i in range(max(len(cells),len(ink))):
+                sx,sy,ch,style=cells[i%len(cells)]
+                target=i%len(ink);tx,ty=ink[target]
+                seed=hash16(target*71+13)
+                ox=1+hash16(i*17)%(w-2);oy=hash16(i*29+10)%h
+                if t<gather:
+                    bend=math.sin(spread*math.pi)
+                    x=mix(sx,ox,spread_ease)+math.sin(sy*.3+spread*TAU)*bend*w*.04
+                    y=mix(sy,oy,spread_ease)+math.cos(sx*.13+spread*TAU)*bend*h*.06
+                    if hash16((i%len(cells))*43)/65535<spread:
+                        ch='01'[seed%2]
+                else:
+                    swirl=math.sin(assembled*math.pi)*(1-assembled)
+                    x=mix(ox,tx,ease)+math.sin(i*.7+t)*swirl*w*.10
+                    y=mix(oy,ty,ease)+math.cos(i*.7+t)*swirl*h*.14
+                    ch='01'[(seed+int(music.beat_position*2))%2] if assembled>.98 else '01'[seed%2]
+                    if hash16(i*53)/65535<ease:
+                        style=v.CYAN if ty<cy else B
+                        if assembled>.98 and music.beat>.6 and seed%5==0:style=W
+                c.put(max(0,min(w-1,round(x))),max(0,min(h-1,round(y))),ch,style)
+            return
     charge=clamp((t-(scatter-.2))/.2)
     assembled=clamp((t-gather)/(lock-gather))
     ease=assembled**3*(10-15*assembled+6*assembled**2)
@@ -2652,13 +2621,18 @@ def title_takeover(c,t,font,music,source=None):
         for x in range(w):
             seed=hash16(x*37+y*911+frame//3)
             if seed/65535<density:c.put(x,y,alphabet[seed%len(alphabet)],G)
-    if source is not None and t<scatter+1.5:
-        u=clamp((t-scatter)/1.5)
-        for y,row in enumerate(source.cells):
-            for x,(char,style) in enumerate(row):
-                if not char.strip() or hash16(x+y*w)%100<u*100:continue
-                px=x+(x-cx)*u*.6;py=y+(y-cy)*u*.6
-                c.put(px,py,char if ord(char[0])<128 else '#',N if u<.25 else G)
+    if lock<=t<release:
+        # Keep the title silhouette locked while its running simulation stays alive.
+        phase=music.beat_position*.35
+        for orbit in range(3):
+            rx=w*(.32+orbit*.075);ry=h*(.24+orbit*.065)
+            for i in range(80):
+                angle=i*TAU/80
+                c.put(round(cx+math.cos(angle)*rx),round(cy+math.sin(angle)*ry),'.',v.SHADE)
+            for packet in range(6):
+                angle=(phase+packet/6+orbit*.11)*TAU
+                c.put(max(1,min(w-5,round(cx+math.cos(angle)*rx))),round(cy+math.sin(angle)*ry),
+                      '[01]',v.CYAN_DIM if orbit%2 else G)
     for i,(tx,ty) in enumerate(ink):
         seed=hash16(i*71+13)
         ox=hash16(i*17)%w;oy=hash16(i*29+10)%h
@@ -2671,9 +2645,11 @@ def title_takeover(c,t,font,music,source=None):
             swirl=math.sin(assembled*math.pi)*(1-assembled)
             x=mix(ox,tx,ease)+math.sin(i*.7+t)*swirl*w*.10
             y=mix(oy,ty,ease)+math.cos(i*.7+t)*swirl*h*.14
-            char='01'[seed%2] if assembled>.98 else alphabet[(seed+frame)%len(alphabet)]
+            char='01'[(seed+int(music.beat_position*2))%2] if assembled>.98 else alphabet[(seed+frame)%len(alphabet)]
             style=B if assembled>.8 or seed%3==0 else N
+            if ty<cy:style=v.CYAN if assembled>.8 or seed%3==0 else v.CYAN_DIM
             if assembled>.98 and music.beat>.6 and seed%5==0:style=W
+            if lock<=t<release and abs(tx-(music.beat_position*.55%1)*w)<2+music.low*3:style=W
         if t<scatter:
             x=mix(tx,x,charge*.15);y=mix(ty,y,charge*.15);style=G
         if release_u:
@@ -2686,6 +2662,229 @@ def title_takeover(c,t,font,music,source=None):
     if lock<=t<release:
         c.center(1,'M I L I',N)
         c.center(h-2,'world.execute(me);',N)
+
+def lyric_boot_program(c,t,area,music):
+    """One circuit board powers up, builds objects and opens their simulation."""
+    l,top,r,bt=area;span=r-l
+    plot_top=top+(6 if c.h>=34 else 4);plot_bt=bt-3
+    cy=(plot_top+plot_bt)/2
+    base_mx=l+span*.28;base_yx=l+span*.73
+    base_radius=max(1.5,min(6,(plot_bt-plot_top)*.23))
+    simulation_at=next((event.time for event in music.events('accent') if event.label=='SIMULATION'),13.891)
+    running=t>=simulation_at
+    dock=clamp((t-12.906)/max(.1,simulation_at-12.906));dock=dock*dock*(3-2*dock)
+    scale=max(1,min(2,(c.w-32)//59,(bt-top-10)//5))
+    final_y=cy+5*scale//2+3 if c.w-32<59*scale<=c.w-6 else cy
+    mx=mix(base_mx,l+9,dock);yx=mix(base_yx,r-9,dock)
+    actor_y=mix(cy,final_y,dock);radius=mix(base_radius,2,dock)
+    events=music.events('boot');done=sum(event.time<=t for event in events)
+    phase=music.beat_position;beat=music.beat
+    world=clamp((t-11.095)/(12.906-11.095))
+    # The board bounds and core coordinates persist across every lyric stage.
+    c.box(l+2,plot_top-1,max(2,span-3),max(3,plot_bt-plot_top+3),N if t>=11.095 else G)
+    for lane in range(3):
+        yy=cy+(lane-1)*max(2,base_radius*.8)
+        c.line(l+4,yy,r-4,yy,'.',v.SHADE)
+        for packet in range(2):
+            xx=l+5+((phase*.18+lane*.23+packet*.5)%1)*(span-12)
+            c.put(round(xx),round(yy),'01' if done else '..',G)
+    if world:
+        for lane in range(1,6):
+            xx=l+3+(span-6)*lane/6
+            height=(plot_bt-plot_top)*world
+            c.line(xx,cy-height/2,xx,cy+height/2,'.',v.SHADE)
+            if running:
+                yy=plot_top+((phase*.22+lane*.17)%1)*(plot_bt-plot_top)
+                c.put(round(xx),round(yy),'[01]',v.CYAN_DIM if lane%2 else G)
+    slot_w=max(10,int(span*.36));slot_h=max(7,plot_bt-plot_top+1)
+    for center,ref,exists in ((base_mx,'0x01',True),(base_yx,'0x02',t>=7.446)):
+        left=round(center-slot_w/2)
+        # The object memory frames dissolve into the larger simulation lattice.
+        for yy in range(plot_top,plot_top+slot_h):
+            for xx in range(left,left+slot_w):
+                edge=yy in (plot_top,plot_top+slot_h-1) or xx in (left,left+slot_w-1)
+                if not edge or hash16(xx*31+yy*73)/65535<world:continue
+                char='+' if yy in (plot_top,plot_top+slot_h-1) and xx in (left,left+slot_w-1) else '-' if yy in (plot_top,plot_top+slot_h-1) else '|'
+                c.put(xx,yy,char,v.SHADE)
+        if world<.85:
+            c.put(left+2,plot_top,'REF '+ref,N if ref=='0x01' else v.CYAN_DIM)
+        if not exists or t<6.38:continue
+        params=int(100*clamp((t-7.70)/(10.091-7.70)))
+        if world<.85:c.put(left+2,plot_bt-1,f'PARAMS {params:03d}%',N)
+        for row in range(3):
+            yy=plot_top+2+row*2
+            if yy>=cy-radius-1:break
+            bits=''.join('1' if bit<round(params/100*8) else '.' for bit in range(8))
+            if world<.65:c.put(left+2,yy,bits,N if ref=='0x01' else v.CYAN_DIM)
+    if t<3.873:
+        lines=('power.on();','memory.protect();','identity.reserve();','signal.connect();')
+        active=min(3,max(0,done-1));u=clamp(t/3.873)
+        # Each confirmed audio onset enables a tangible subsystem on the board.
+        labels=('POWER','MEMORY','IDENTITY','SIGNAL','CORE')
+        checks_x=round(base_yx-slot_w/2)+2
+        for i,label in enumerate(labels):
+            yy=plot_top+2+i*max(2,(slot_h-5)//5)
+            if yy>=plot_bt:break
+            checked=i<done
+            c.put(checks_x,yy,('[OK] ' if checked else '[..] ')+label,B if checked else v.SHADE)
+            if c.w>=100:
+                c.put(checks_x+15,yy,'[####]' if checked else '[....]',G)
+        shell=base_radius+1.5
+        for i in range(100):
+            a=i*TAU/100
+            xx=base_mx+math.cos(a)*shell/CELL_ASPECT;yy=cy+math.sin(a)*shell
+            if t<2.92 and i%20<4:continue
+            if plot_top<=yy<=plot_bt:
+                ink=W if 0<=t-2.92<.16 else N if i<done*20 else v.SHADE
+                c.put(round(xx),round(yy),':' if i%5 else '+',ink)
+        for lane in range(3):
+            yy=cy+(lane-1)*2
+            v.signal(c,(l+5,yy),(base_mx-base_radius*2-1,yy),phase*.45+lane*.2,ink=B,trail=4)
+        v.actor(c,base_mx,cy,'ME',radius=max(1,base_radius*(.45+.55*u)),ghost=u<.3)
+        protection='ACTIVE' if t>=2.92 else 'ARMED'
+        c.center(bt,f'POWER / CHECK {done:02d}/05 / PROTECTION {protection}',B)
+    elif t<6.38:
+        u=clamp((t-3.873)/(6.38-3.873));ease=u*u*(3-2*u)
+        for i,char in enumerate(('<>','[]','{}','()','01','::','+=','..','00','11','==','##')):
+            a=i*TAU/12;shell=base_radius+1.5
+            sx=base_mx+math.cos(a)*shell/CELL_ASPECT;sy=cy+math.sin(a)*shell
+            xx=mix(sx,base_mx,ease);yy=mix(sy,cy,ease)
+            if plot_top<=yy<=plot_bt:c.put(round(xx),round(yy),char,B if i%2 else v.ROSE_DIM)
+        for i in range(5):
+            yy=plot_top+2+i*max(2,(slot_h-5)//5)
+            if yy<plot_bt:c.put(round(base_yx-slot_w/2)+2,yy,'[OK] '+('POWER','MEMORY','IDENTITY','SIGNAL','CORE')[i],G)
+        lines=('parts = memory.read();','ME = assemble(parts);');active=int(u>.5)
+        v.actor(c,base_mx,cy,'ME',radius=base_radius)
+        c.center(bt,'OBJECT ASSEMBLY / PARTS -> INSTANCE',B)
+    else:
+        if t<11.095:
+            active=0 if t<7.446 else 1 if t<7.70 else 2 if t<10.091 else 3
+            lines=('ME = allocate();','YOU = allocate();','parameters.write(ME, YOU);','initialize(ME, YOU);')
+        else:
+            active=2 if running else 0 if t<12.906 else 1
+            lines=('WORLD = new World();','WORLD.add(ME, YOU);','WORLD.simulate();')
+        if t>=7.446:
+            born=clamp((t-7.446)/.45);born=born*born*(3-2*born)
+            for lane in range(3):
+                yy=actor_y+(lane-1)*max(2,radius*.8)
+                v.signal(c,(mx+radius*2+1,yy),(yx-radius*2-1,yy),phase*.35+lane/3,
+                         ink=v.CYAN if t>=10.091 else B,trail=5)
+            v.actor(c,yx,actor_y,'YOU',radius=max(1,radius*born),ghost=born<.35)
+        v.actor(c,mx,actor_y,'ME',radius=radius)
+        if running:
+            title_y=round(cy)-5*scale//2
+            # Existing cores have already docked during "And let's begin the".
+            # The sung hit lights the same board instead of replacing its geometry.
+            c.big(title_y,'SIMULATION',W,scale)
+            sweep=(phase*.25)%1
+            for yy in (plot_top,plot_bt):
+                xx=l+4+sweep*(span-10)
+                c.put(round(xx),yy,'[RUN]',B if beat<.6 else W)
+            c.center(bt,'SIMULATION / ONLINE / ME + YOU',B)
+        else:
+            if 10.091<=t<11.095:
+                hit=math.exp(-(t-10.091)*5)
+                for x in (base_mx,base_yx):
+                    rr=base_radius+1+hit*1.2
+                    for i in range(64):
+                        a=i*TAU/64;xx=x+math.cos(a)*rr/CELL_ASPECT;yy=cy+math.sin(a)*rr
+                        if l+1<=xx<=r-1 and plot_top<=yy<=plot_bt:c.put(round(xx),round(yy),'+',N)
+            c.center(bt,'OBJECT CREATION / PARAMETERS -> INITIALIZATION',B)
+    v.code_card(c,(l,top+3,r,top+6) if t<3.873 else area,lines,active)
+
+
+def lyric_role_handoff(c,t,area,music):
+    """A visible control token changes owner and reverses the data direction."""
+    l,top,r,bt=area;cy=(top+bt)/2+1
+    mx=l+(r-l)*.23;yx=l+(r-l)*.77
+    u=clamp((t-95.465)/(97.739-95.465));committed=t>=97.739
+    if committed:v.signal(c,(yx-5,cy),(mx+5,cy),music.beat_position*.5,ink=v.CYAN)
+    else:v.signal(c,(mx+5,cy),(yx-5,cy),u,ink=v.ROSE)
+    key_x=mix(mx+6,yx-6,u)
+    c.box(round(key_x)-2,round(cy)-4,5,3,v.ROSE)
+    c.put(key_x-1,cy-3,'KEY',W)
+    v.actor(c,mx,cy,'ME',radius=3)
+    v.actor(c,yx,cy,'YOU',radius=3)
+    c.put(mx-1,cy+5,'M' if committed else 'S',B)
+    c.put(yx-1,cy+5,'S' if committed else 'M',v.CYAN)
+    v.code_card(c,area,('key = ME.control;','YOU.acquire(key);','ME.role = M;'),2 if committed else 1 if u>.25 else 0)
+    c.center(bt,'CONTROL / YOU -> ME' if committed else 'CONTROL TOKEN / TRANSFERRING',v.ROSE)
+
+
+def relation_layer(c,t,area,music):
+    """Causal actor and data paths on existing mathematical/identity geometry."""
+    if not (29.809<=t<44.452 or 47.672<=t<55.083 or 88.587<=t<95.465 or 99.349<=t<103.489):return
+    l,top,r,bt=area;cx,cy=(l+r)/2,(top+bt)/2
+    mx,my=l+7,cy;yx,yy=r-7,cy;me_r=you_r=2
+    lines=();active=0
+    if t<33.412:
+        u=clamp((t-31.116)/(33.412-31.116))
+        v.signal(c,(cx+8,cy),(yx-5,cy),u,ink=v.CYAN,amount=int(t>=31.116))
+        if t>=32.682:
+            c.line(yx-6,cy+5,yx+5,cy+5,'-',v.CYAN_DIM)
+            c.line(yx-5,cy+6,yx-5,cy-5,'|',v.CYAN_DIM)
+        lines=('points = ME.dimension();','YOU.receive(points);');active=int(t>=31.116)
+    elif t<37.067:
+        mx=cx
+        rim=[(x,y)for y in range(max(top,int(cy)-2),min(bt,int(cy)+2)+1)
+             for x,(ch,ink)in enumerate(c.cells[y])if ch in ('o','\u25c9','\u25cf','\u25cb')and ink in(N,B,W)]
+        donor=max(rim,key=lambda p:p[0]) if rim else (cx+12,cy)
+        u=clamp((t-34.646)/(37.067-34.646))
+        v.signal(c,donor,(yx-5,cy),u,ink=v.CYAN,amount=int(t>=34.646))
+        if t>=36.287:
+            for i in range(50):
+                a=i*TAU/50;c.put(yx+math.cos(a)*7,cy+math.sin(a)*3.5,'.',v.CYAN)
+        lines=('arc = ME.extract(RIM);','YOU.receive(arc);');active=int(t>=34.646)
+    elif t<40.706:
+        amp=(bt-top)*(.28+.05*music.mid)
+        candidates=[]
+        for i in range(41):
+            x=l+(r-l)*(.25+i*.015)
+            a=(x-l)/(r-l)*TAU*2.5-t*.5
+            y=cy+math.sin(a)*amp;slope=math.cos(a)*amp/(r-l)*TAU*2.5
+            if y>cy:candidates.append((abs(slope),x,y,slope))
+        _,yx,seat,slope=min(candidates)
+        yy=seat-2
+        for dx in range(-6,7):
+            if l<yx+dx<r:c.put(yx+dx,seat+slope*dx,'=',v.CYAN)
+        lines=('curve = ME.sin(x);','tangent = derivative(curve);','YOU.sit(tangent);')
+        active=2 if t>=40.049 else 1
+    elif t<44.452:
+        yx=r-8;yy=cy
+        c.line(yx-6,top+5,yx-6,bt-3,'|',v.CYAN)
+        v.signal(c,(mx+5,cy),(yx-6,cy),music.beat_position*.35,ink=v.ROSE)
+        lines=('ME.grow(INFINITY);','limit = YOU.boundary;','ME.bind(limit);');active=2 if t>=43.507 else 1
+    elif t<51.363:
+        mx=cx;my=cy;yx=r-10;yy=cy+math.sin(t*2)*3
+        iris=max(3,(bt-top)*.30)
+        for i in range(100):
+            a=i*TAU/100
+            c.put(cx+math.cos(a)*iris*2,cy+math.sin(a)*iris*.65,'.',v.ROSE_DIM)
+        lines=('ME.vision.mask();','ME.sensor = UNSTABLE;');active=int(t>=49.534)
+    elif t<55.083:
+        shift=math.sin((t-51.363)*1.2)*(r-l)*.10
+        mx=cx-12+shift;yx=cx+12+shift;my=yy=cy+3
+        v.signal(c,(mx+5,my),(yx-5,yy),music.beat_position*.4,ink=v.ROSE)
+        lines=('WORLD.clock.reverse();','WORLD.travel(AD, BC);');active=int(t>=53.225)
+    elif t<92.015:
+        mx=cx-8;yx=r-8;my=yy=bt-4
+        v.signal(c,(mx+5,my),(yx-5,yy),music.beat_position*.4,ink=v.CYAN)
+        lines=('ME.gender = F;','rewrite(ME.gender);','ME.gender = M;')
+        active=2 if t>=91.447 else 1 if t>=90.197 else 0
+    elif t<95.465:
+        mx=(l+cx)/2;my=cy+(bt-top)*.19;me_r=1.5
+        yx=r-5;yy=bt-3;you_r=1.2
+        lines=('WORLD.clock.tick();','WORLD.cycle(AM, PM);');active=int(t>=93.953)
+    else:
+        mx=cx-12;yx=cx+12;my=yy=cy+2
+        v.signal(c,(yx-5,yy),(mx+5,my),music.beat_position*.4,ink=v.CYAN)
+        lines=('ME.follow(YOU);','phase_lock.acquire();');active=int(t>=101.474)
+    # Clear duplicate old headings; the active call now carries that information.
+    c.put(l,top,' '*(r-l+1),D);c.put(l,top+1,' '*(r-l+1),D)
+    v.actor(c,mx,my,'ME',radius=me_r)
+    v.actor(c,yx,yy,'YOU',radius=you_r)
+    v.code_card(c,area,lines,active)
+
 
 # ============ MAIN SCENE DISPATCHER ============
 def draw_scene(c,t,top,bt,music,e):
@@ -2701,25 +2900,7 @@ def draw_scene(c,t,top,bt,music,e):
 
     # Boot sequence (0-16s)
     if t<16:
-        if t<1.74:
-            lyric_power_line(c,t,area,music)
-        elif t<2.92:
-            # "Remember to put on" - continue showing boot complete
-            lyric_power_line(c,t,area,music)
-        elif t<3.873:
-            lyric_protection(c,t,area,t-2.92)
-        elif t<5.491:
-            lyric_lay_pieces(c,t,area,t-3.873)
-        elif t<6.38:
-            lyric_lay_pieces(c,t,area,t-3.873)
-        elif t<7.446:
-            lyric_object_creation(c,t,area,t-6.38)
-        elif t<10.091:
-            lyric_data_parameters(c,t,area,t-7.446)
-        elif t<11.095:
-            lyric_data_parameters(c,t,area,t-7.446)
-        elif t<16:
-            lyric_simulation(c,t,area,t-11.095)
+        lyric_boot_program(c,t,area,music)
 
     # Title takeover (handled in player.py)
     elif 16<=t<29.709:
@@ -2756,20 +2937,21 @@ def draw_scene(c,t,top,bt,music,e):
     elif t<74.045:
         if t<62.589:
             # "If I can give you all the"
-            lyric_stimulation_satisfaction(c,t,area,t-59.223)
+            lyric_stimulation_satisfaction(c,t,area,t-59.223,music)
         elif t<66.601:
             # "SATISFACTION"
-            lyric_stimulation_satisfaction(c,t,area,t-59.223)
+            lyric_stimulation_satisfaction(c,t,area,t-59.223,music)
         elif t<70.084:
             lyric_happy_execution(c,t,area,music)
         elif t<74.045:
             lyric_trapped_simulation(c,t,area,music)
 
-    # Original eggplant, tomato and cat; keep the revised god scene.
+    # Procedural, recognizable type conversions and resource transfer.
     elif t<85.078:
-        legacy_organic(c,t,top,bt,pulse)
+        from scenes_organic import draw_organic
+        draw_organic(c,t,area,music)
     elif t<88.587:
-        lyric_god_existence(c,t,area,t-85.078)
+        lyric_god_existence(c,t,area,t-85.078,music)
 
     # Identity switching (88-103s)
     elif t<103.489:
@@ -2781,7 +2963,7 @@ def draw_scene(c,t,top,bt,music,e):
             lyric_daynight_clock(c,t,area)
         elif t<99.349:
             # Role switch S to M
-            lyric_gender_role_switch(c,t,area,t-95.465,'S','M')
+            lyric_role_handoff(c,t,area,music)
         else:
             # Trance
             lyric_dizzy(c,t,area,t-99.349)
@@ -2824,6 +3006,8 @@ def draw_scene(c,t,top,bt,music,e):
     # Outro (192+)
     else:
         lyric_outro_wait(c,t,area,music)
+
+    relation_layer(c,t,area,music)
 
     # Apply escalating glitch effect
     if t<192.5:
