@@ -4,6 +4,19 @@
 
 Mili《world.execute(me);》的字符动画。支持 Windows 10/11 和 macOS，提供中英字幕、原曲同步播放和终端字符动画。Python 播放器仅使用标准库，无需 `pip install`。
 
+## 音乐编排与画面
+
+- 使用预计算的整体能量、低／中／高频和瞬态信息驱动画面，拍点与强调事件保存在 `score.json`；暂停、跳转和快照都按音频时间定位。
+- 保留琥珀色 CRT 风格，扩大几何主体，保护关键文字和双语字幕；12 次 EXECUTION 按“入队、覆盖、锁死”递进，每次使用不同动作。
+- 播放提示在开始或操作后显示 3 秒，随后收起；暂停或按 H 显示信息。浮层切换不改变动画与字幕位置。
+- 终端采用差量输出，减少重复写出，并正确处理中文双宽字符。
+
+默认以 **30 FPS** 播放，已完成整曲测试和用户观看确认。本机隐藏 Windows 控制台、128×44 内容区的整曲测试中，稳态整帧 P95 为 **7.61ms**。如需降低帧率：
+
+```powershell
+python player.py --fps 24
+```
+
 ## 创作提示词
 
 整理了这支 MV 从初始构想到逐段调整的 **25 轮提示词**，以及一份方便复用的合并版。
@@ -21,11 +34,16 @@ Mili《world.execute(me);》的字符动画。支持 Windows 10/11 和 macOS，�
 | Windows 10/11 | `world-execute-mv-windows.zip` | `运行单文件.cmd` |
 | macOS 12+ | `world-execute-mv-macos.zip` | `运行单文件.command` |
 
-播放包需要 **Python 3.9 或更新版本**。Windows 自动调用系统自带的 Windows PowerShell 5.1 和 .NET Framework 媒体组件，无需 Swift 或额外 Python 包；macOS 音频组件包含 Apple Silicon 和 Intel 架构。音乐、动画、字幕、频谱数据和播放组件均内嵌于 `world-execute-mv.pyz`，无需额外指定 MP3。两个系统的播放包不能混用。
+播放包使用 **Python 3.9 或更新版本**。Windows 解压完整 ZIP 后，双击 `运行单文件.cmd` 即可：启动器会检查 Python 和系统音频组件，优先复用现有 Python；未找到可用版本时，自动从 python.org 下载匹配 x64／ARM64／x86 的 Python 3.14.9 便携运行时，校验 SHA-256 后保存在 `%LOCALAPPDATA%\world-execute-mv\runtime`。首次缺少 Python 时需要联网，后续可离线使用；无需管理员权限，不修改系统 Python、PATH 或 PowerShell 执行策略。
+
+Windows 音频使用系统自带的 Windows PowerShell 5.1 和 .NET Framework 媒体组件，无需 Swift 或额外 Python 包；如果系统组件被禁用，启动器会显示修复提示。macOS 需自行准备 Python，音频组件包含 Apple Silicon 和 Intel 架构。音乐、动画、字幕、频谱数据和播放组件均内嵌于 `world-execute-mv.pyz`，无需额外指定 MP3。两个系统的播放包不能混用。
 
 在 Windows Terminal / PowerShell 中进入解压目录：
 
 ```powershell
+.\运行单文件.cmd
+
+# 已有 Python 时也可直接运行单文件
 python world-execute-mv.pyz
 ```
 
@@ -42,7 +60,7 @@ python3 world-execute-mv.pyz
 python3 world-execute-mv.pyz --start 158.7 --autoplay
 ```
 
-内嵌音乐是随程序封装的资源，不是加密或 DRM。播放时会解包到当前用户的临时目录，正常退出后清理；不会读取旧电脑 Downloads 中的文件。运行过程无需联网。
+内嵌音乐是随程序封装的资源，不是加密或 DRM。播放时会解包到当前用户的临时目录，正常退出后清理；不会读取旧电脑 Downloads 中的文件。依赖准备完成后，播放过程无需联网。
 
 ## 操作
 
@@ -61,7 +79,7 @@ python3 world-execute-mv.pyz --start 158.7 --autoplay
 
 ### Windows
 
-安装 Python 3.9+，然后在项目目录运行（或双击 `run.cmd`）：
+在项目目录运行（或双击 `run.cmd`），启动器同样会自动检测并准备 Python：
 
 ```powershell
 .\run.cmd
@@ -73,7 +91,7 @@ python player.py --audio "D:\音乐\world.execute(me).mp3"
 python player.py --audio "D:\音乐\world.execute(me).mp3" --start 158.7 --autoplay
 ```
 
-如果没有 `python` 命令但已安装 Python Launcher，可用 `py -3` 替代。启动器会优先尝试 `py -3`。
+直接使用 `python` 命令需要自行安装 Python 3.9+；如果只有 Python Launcher，可用 `py -3` 替代。两个 CMD 启动器依次检查 `py -3`、`python` 和用户缓存，跳过不可用或过旧的版本。保留启动器旁的 `ensure-runtime.ps1` 与 `python-runtime.json`；仅下载 `.pyz` 不包含自动准备前置。
 
 还没有音频时，可以先查看动画快照，无需音频设备或交互终端：
 
@@ -115,18 +133,47 @@ macOS 将 `python` 换为 `python3`，音频路径换为本机路径即可。构
 构建输出在 `dist/`：
 
 - `world-execute-mv.pyz`：内嵌音乐的单文件播放器。
-- `world-execute-mv-windows.zip` 或 `world-execute-mv-macos.zip`：包含播放器、对应启动器、说明的分发包。
+- `world-execute-mv-windows.zip` 或 `world-execute-mv-macos.zip`：包含播放器、对应启动器、说明的分发包；Windows ZIP 还包含依赖检测和下载前置。
 - `SHA256SUMS.txt`：下载校验值。
 
 音频以系统播放器报告的位置驱动画面；暂停、跳转时字幕与动画跟随音频时间。Windows 使用 WPF `MediaPlayer`，macOS 使用 AVFoundation。macOS 构建会生成 universal 音频组件；两种包都会记录各资源 SHA-256 以检查完整性。
 
 ## 验证
 
+完整开发测试使用 Python 3.14，并需要 FFmpeg、NumPy 和 Pillow。它们仅用于制作、预览和测试，普通播放不需要安装：
+
 ```powershell
+python -m pip install -r tools/requirements-music.txt Pillow
 python -B -m unittest discover -s tests -v
 ```
 
-测试使用临时静音 WAV 自动构建测试包，无需原曲或预先生成 `dist/`。覆盖快照、资源完整性、临时文件清理；Windows 额外验证真实音频接口和隐藏控制台中的按键、播放、退出与状态恢复。如果本机已有 FFmpeg，还会生成变码率 MP3 验证音频时钟；没有 FFmpeg 时仅跳过这一项，正常播放不依赖 FFmpeg。macOS 构建测试需要 Apple Command Line Tools。静音测试不验证原曲与画面的实际同步效果。
+测试用临时静音 WAV 构建播放包，覆盖音乐事件边界、五种尺寸、跳转确定性、字幕布局、差量输出、双宽字符、完整性和文件清理。Windows 额外验证真实音频接口和隐藏控制台。原曲未放入 `media/song.mp3` 时，仅跳过原曲指纹／原曲片段检查；macOS 构建测试需要 Apple Command Line Tools。
+
+记录播放性能（正常退出后写入报告）：
+
+```powershell
+New-Item -ItemType Directory -Path .build -Force | Out-Null
+python player.py --fps 30 --report .build/playback-report.json
+```
+
+报告包含绘制、ANSI 编码、终端写出及整帧的 P50/P95/P99、输出字节数、全量／差量／未变化帧数和超预算帧数。长运行剔除开始的 30 帧后统计稳态数据。自动测试不代替实际听看验收。
+
+## 制作音乐数据与对照预览
+
+`music_features.json` 是连续特征，`score.json` 是按乐段校准的拍点、歌词强调和转场标记。两者随包分发，播放时直接查询，不进行 FFT。
+
+```powershell
+# 重新计算特征；不会修改人工维护的 score.json
+python tools/analyze_music.py
+
+# 候选拍点必须输出到新文件，再单独审核
+python tools/analyze_music.py --candidates .build/beat-candidates.json
+
+# 制作一段带原曲的预览（开发工具，需要 Windows 字体）
+python tools/render_preview.py --source-dir . --start 147.66 --duration 29.586 --fps 30 --width 128 --height 44 --audio media/song.mp3 --output .build/execution-preview.mp4
+```
+
+采样参数、音频指纹和校准来源均记录在数据中。当前拍点校准依据分段音频分析与歌词时间；`human_listening` 标记不会因为自动测试通过而自动变为已听审。比较不同版本时，分别指定各自源码目录，使用相同音频起点、长度和帧率。
 
 ## 收录范围
 

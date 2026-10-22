@@ -10,7 +10,8 @@ import zipapp
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-FILES = ('player.py', 'scenes.py', 'terminal.py', 'config.json', 'lyrics.json', 'spectrum.json')
+FILES = ('player.py', 'scenes.py', 'terminal.py', 'music.py', 'render_output.py',
+         'config.json', 'lyrics.json', 'spectrum.json', 'music_features.json', 'score.json')
 
 
 def build(audio, output):
@@ -51,10 +52,13 @@ def build(audio, output):
     # A small convenient download with the single-file player and instructions.
     distribution = output/('world-execute-mv-windows.zip' if windows else 'world-execute-mv-macos.zip')
     launcher = '运行单文件.cmd' if windows else '运行单文件.command'
+    distribution_files = [('world-execute-mv.pyz', package), ('README.md', ROOT/'README.md'),
+                          (launcher, ROOT/launcher),
+                          ('docs/images/mv-cover.png', ROOT/'docs/images/mv-cover.png')]
+    if windows:
+        distribution_files.extend((name, ROOT/name) for name in ('ensure-runtime.ps1', 'python-runtime.json'))
     with zipfile.ZipFile(distribution, 'w', zipfile.ZIP_DEFLATED) as archive:
-        for name, path in [('world-execute-mv.pyz', package), ('README.md', ROOT/'README.md'),
-                           (launcher, ROOT/launcher),
-                           ('docs/images/mv-cover.png', ROOT/'docs/images/mv-cover.png')]:
+        for name, path in distribution_files:
             archive.write(path, 'world-execute-mv/'+name)
     paths = [package, distribution]
     (output/'SHA256SUMS.txt').write_text(''.join(

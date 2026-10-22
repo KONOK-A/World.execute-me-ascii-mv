@@ -1,0 +1,4150 @@
+{
+  "version": 1,
+  "duration": 211.906667,
+  "source": {
+    "path": "media/song.mp3",
+    "sha256": "281b063eeb0c3147dc1093b2380e36b83acdb4f21f61b128ee619123fe2ccd61",
+    "bytes": 8479476,
+    "decoded_sample_count": 4672542,
+    "decoded_duration": 211.90666666666667,
+    "time_origin": "first decoded PCM sample; FFmpeg applies codec skip/discard metadata"
+  },
+  "lyrics": {
+    "path": "lyrics.json",
+    "sha256": "b2a8c9a9c600b25acae29d2c622bf816a69b5f92a93b5bd4c0d423982a2da987",
+    "hash_encoding": "UTF-8/LF"
+  },
+  "calibration": {
+    "status": "numeric_review_only",
+    "human_listening": false,
+    "human_visual_acceptance": false,
+    "reviewer": "Codex numerical/audio-onset review; no human listening performed",
+    "method": "15 sections: local autocorrelation, phase scoring, onset snapping, explicit endpoint review of identity/count harmonic ambiguity, boundary-gap inspection.",
+    "audio_inspection": "Original media/song.mp3 decoded with FFmpeg. Initial independent 2048-sample rFFT scan found ~0.459s autocorrelation in all broad sections; packaged 1024-sample features resolve transient timing more finely.",
+    "cue_policy": "Copy lyrics.json start values exactly; never snap vocal/semantic events to instrumental beats. 12 execution cues are three groups of four; six counts and six departures are separate kinds.",
+    "time_origin": "First decoded PCM sample, no additional MP3 encoder offset. Decoder count 4672542 / 22050 = 211.90666666666667s; declared end rounded to 211.906667s.",
+    "beat_position": "Continuous ordinal between stored nonuniform beats; extrapolate first/last interval at edges, but generate pulses only for stored beats. No phase reset at a section boundary. Half time uses beat_position / 2.",
+    "title_policy": "Onset-backed title transitions chosen near existing staging; remaining semantic transitions preserve lyric/accepted-plan boundaries.",
+    "final_execution": "Exact lyric start 205.811, independently of the nearby instrumental transient at 205.69.",
+    "limitations": [
+      "Onset peak is a numerical spectral-growth maximum, not a guaranteed perceptual downbeat; typical grid resolution is 9.977ms.",
+      "Symmetric windows/smoothing may anticipate acoustic attacks slightly; semantic cue envelopes are strictly causal.",
+      "Organic/identity contain weak/syncopated attacks; retained local peak jitter is intentional and requires listening/visual acceptance.",
+      "No full-song human listening, audiovisual acceptance, or beat-meter/downbeat validation has been performed.",
+      "Beat pulses end at the last supported outro beat; beat_position continues through the residual tail."
+    ],
+    "boot_review": {
+      "status": "numeric_review_only",
+      "human_listening": false,
+      "range_seconds": [
+        0,
+        1.74
+      ],
+      "features_sha256": "9333bfbdbd6fe8b312e4a66f255073baac508c07beb632addc93de97e2336638",
+      "selection": "First substantial onset at 0.179592 followed by four strong peaks at 0.309297, 0.768254, 1.227211 and 1.696145. POWER is weaker than the following four checks; strengths preserve normalized measured onset values.",
+      "independent_check": "Re-decoded first two seconds of original media/song.mp3 at 22050 Hz; 1024-point periodic Hann rFFT, 110-sample hop, positive magnitude flux at adjacent-center midpoints. Selected feature peaks are within 7.5 ms of raw flux peaks.",
+      "semantics": "POWER, MEMORY, IDENTITY, SIGNAL and CONSCIOUSNESS are authored visual checklist labels, not words detected in the audio. Timing is audio-onset reviewed numerically only.",
+      "features_hash_encoding": "UTF-8/LF"
+    },
+    "execution_visual_review": {
+      "status": "accepted",
+      "scope": "Twelve execution action variants,147.66..158.9 seconds",
+      "evidence": "User accepted the revised side-by-side video; not a full-song beat-meter/listening review."
+    }
+  },
+  "sections": [
+    {
+      "time": 0.0,
+      "label": "boot"
+    },
+    {
+      "time": 16.0,
+      "label": "title"
+    },
+    {
+      "time": 29.709,
+      "label": "devotion"
+    },
+    {
+      "time": 59.223,
+      "label": "satisfaction"
+    },
+    {
+      "time": 74.045,
+      "label": "organic"
+    },
+    {
+      "time": 88.587,
+      "label": "identity"
+    },
+    {
+      "time": 103.489,
+      "label": "completion"
+    },
+    {
+      "time": 110.9,
+      "label": "isolation"
+    },
+    {
+      "time": 118.333,
+      "label": "fragments"
+    },
+    {
+      "time": 125.708,
+      "label": "arguments"
+    },
+    {
+      "time": 147.66,
+      "label": "execution"
+    },
+    {
+      "time": 158.9,
+      "label": "count"
+    },
+    {
+      "time": 162.632,
+      "label": "execution_return"
+    },
+    {
+      "time": 177.246,
+      "label": "love"
+    },
+    {
+      "time": 192.5,
+      "label": "outro"
+    }
+  ],
+  "beat_calibration": [
+    {
+      "time": 0.0,
+      "label": "boot",
+      "end": 16.0,
+      "period": 0.461160419,
+      "autocorrelation": 0.79601,
+      "onset_matches": 35,
+      "residual_p95_seconds": 0.006367,
+      "candidate_period": 0.461160419,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        0.309297,
+        15.983673
+      ],
+      "beat_count": 35,
+      "interval_range_seconds": [
+        0.44898,
+        0.468935
+      ]
+    },
+    {
+      "time": 16.0,
+      "label": "title",
+      "end": 29.709,
+      "period": 0.461275745,
+      "autocorrelation": 0.590042,
+      "onset_matches": 29,
+      "residual_p95_seconds": 0.014966,
+      "candidate_period": 0.461275745,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        16.462585,
+        29.373243
+      ],
+      "beat_count": 29,
+      "interval_range_seconds": [
+        0.439002,
+        0.478912
+      ]
+    },
+    {
+      "time": 29.709,
+      "label": "devotion",
+      "end": 59.223,
+      "period": 0.461507211,
+      "autocorrelation": 0.704833,
+      "onset_matches": 64,
+      "residual_p95_seconds": 0.016562,
+      "candidate_period": 0.461507211,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        29.822222,
+        58.9161
+      ],
+      "beat_count": 64,
+      "interval_range_seconds": [
+        0.448979,
+        0.488889
+      ]
+    },
+    {
+      "time": 59.223,
+      "label": "satisfaction",
+      "end": 74.045,
+      "period": 0.461122595,
+      "autocorrelation": 0.44211,
+      "onset_matches": 32,
+      "residual_p95_seconds": 0.010144,
+      "candidate_period": 0.461122595,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        59.385034,
+        73.68254
+      ],
+      "beat_count": 32,
+      "interval_range_seconds": [
+        0.448979,
+        0.478911
+      ]
+    },
+    {
+      "time": 74.045,
+      "label": "organic",
+      "end": 88.587,
+      "period": 0.460607728,
+      "autocorrelation": 0.3567,
+      "onset_matches": 32,
+      "residual_p95_seconds": 0.039593,
+      "candidate_period": 0.460607728,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        74.171429,
+        88.458957
+      ],
+      "beat_count": 32,
+      "interval_range_seconds": [
+        0.40907,
+        0.518821
+      ]
+    },
+    {
+      "time": 88.587,
+      "label": "identity",
+      "end": 103.489,
+      "period": 0.461853548,
+      "autocorrelation": 0.264006,
+      "onset_matches": 32,
+      "residual_p95_seconds": 0.029256,
+      "candidate_period": 0.689536322,
+      "review": "Rejected strongest 3/2-period candidate using adjacent-section phase and individually inspected first/last onset anchors; counted 31 intervals. Alternative quarter-note autocorrelation 0.20883; listening still pending.",
+      "anchors": [
+        88.917914,
+        103.235374
+      ],
+      "beat_count": 32,
+      "interval_range_seconds": [
+        0.399093,
+        0.518821
+      ]
+    },
+    {
+      "time": 103.489,
+      "label": "completion",
+      "end": 110.9,
+      "period": 0.46170364,
+      "autocorrelation": 0.623235,
+      "onset_matches": 16,
+      "residual_p95_seconds": 0.017731,
+      "candidate_period": 0.46170364,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        103.684354,
+        110.608617
+      ],
+      "beat_count": 16,
+      "interval_range_seconds": [
+        0.439002,
+        0.488889
+      ]
+    },
+    {
+      "time": 110.9,
+      "label": "isolation",
+      "end": 118.333,
+      "period": 0.462052155,
+      "autocorrelation": 0.573556,
+      "onset_matches": 16,
+      "residual_p95_seconds": 0.011878,
+      "candidate_period": 0.462052155,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        111.057596,
+        117.991837
+      ],
+      "beat_count": 16,
+      "interval_range_seconds": [
+        0.44898,
+        0.478912
+      ]
+    },
+    {
+      "time": 118.333,
+      "label": "fragments",
+      "end": 125.708,
+      "period": 0.460957868,
+      "autocorrelation": 0.696042,
+      "onset_matches": 16,
+      "residual_p95_seconds": 0.011938,
+      "candidate_period": 0.460957868,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        118.460771,
+        125.365079
+      ],
+      "beat_count": 16,
+      "interval_range_seconds": [
+        0.439002,
+        0.468934
+      ]
+    },
+    {
+      "time": 125.708,
+      "label": "arguments",
+      "end": 147.66,
+      "period": 0.461612887,
+      "autocorrelation": 0.709944,
+      "onset_matches": 48,
+      "residual_p95_seconds": 0.014399,
+      "candidate_period": 0.461612887,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        125.824036,
+        147.514739
+      ],
+      "beat_count": 48,
+      "interval_range_seconds": [
+        0.448979,
+        0.468935
+      ]
+    },
+    {
+      "time": 147.66,
+      "label": "execution",
+      "end": 158.9,
+      "period": 0.461868233,
+      "autocorrelation": 0.617733,
+      "onset_matches": 24,
+      "residual_p95_seconds": 0.011559,
+      "candidate_period": 0.461868233,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        147.973696,
+        158.609524
+      ],
+      "beat_count": 24,
+      "interval_range_seconds": [
+        0.448979,
+        0.478912
+      ]
+    },
+    {
+      "time": 158.9,
+      "label": "count",
+      "end": 162.632,
+      "period": 0.463232857,
+      "autocorrelation": 0.456483,
+      "onset_matches": 8,
+      "residual_p95_seconds": 0.012685,
+      "candidate_period": 0.695033825,
+      "review": "Rejected strongest 3/2-period candidate using adjacent-section phase and individually inspected first/last onset anchors; counted 7 intervals. Alternative quarter-note autocorrelation 0.12757; listening still pending.",
+      "anchors": [
+        159.068481,
+        162.311111
+      ],
+      "beat_count": 8,
+      "interval_range_seconds": [
+        0.44898,
+        0.478911
+      ]
+    },
+    {
+      "time": 162.632,
+      "label": "execution_return",
+      "end": 177.246,
+      "period": 0.461162148,
+      "autocorrelation": 0.49018,
+      "onset_matches": 32,
+      "residual_p95_seconds": 0.01324,
+      "candidate_period": 0.461162148,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        162.780045,
+        177.057596
+      ],
+      "beat_count": 32,
+      "interval_range_seconds": [
+        0.439002,
+        0.478912
+      ]
+    },
+    {
+      "time": 177.246,
+      "label": "love",
+      "end": 192.5,
+      "period": 0.461031443,
+      "autocorrelation": 0.425676,
+      "onset_matches": 33,
+      "residual_p95_seconds": 0.018921,
+      "candidate_period": 0.461031443,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        177.516553,
+        192.282993
+      ],
+      "beat_count": 33,
+      "interval_range_seconds": [
+        0.448979,
+        0.478912
+      ]
+    },
+    {
+      "time": 192.5,
+      "label": "outro",
+      "end": 211.906667,
+      "period": 0.461647705,
+      "autocorrelation": 0.776399,
+      "onset_matches": 32,
+      "residual_p95_seconds": 0.011819,
+      "candidate_period": 0.461647705,
+      "review": "Retained section-local fit after numerical inspection of onset support, spacing and boundary continuity; not listened.",
+      "anchors": [
+        192.761905,
+        207.049433
+      ],
+      "beat_count": 32,
+      "interval_range_seconds": [
+        0.439002,
+        0.478912
+      ]
+    }
+  ],
+  "beats": [
+    {
+      "time": 0.309297,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 0.768254,
+      "strength": 0.97406,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 1.227211,
+      "strength": 0.97066,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 1.696145,
+      "strength": 0.99149,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 2.155102,
+      "strength": 0.96119,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 2.614059,
+      "strength": 0.81388,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 3.073016,
+      "strength": 0.92001,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 3.531973,
+      "strength": 0.883,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 3.99093,
+      "strength": 0.89903,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 4.459864,
+      "strength": 0.93227,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 4.918821,
+      "strength": 0.89655,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 5.377778,
+      "strength": 0.88853,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 5.836735,
+      "strength": 0.89761,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 6.305669,
+      "strength": 0.88092,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 6.764626,
+      "strength": 0.90862,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 7.223583,
+      "strength": 0.88054,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 7.68254,
+      "strength": 0.88823,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 8.151474,
+      "strength": 0.95553,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 8.610431,
+      "strength": 0.94721,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 9.069388,
+      "strength": 0.9184,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 9.528345,
+      "strength": 0.94752,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 9.987302,
+      "strength": 0.83862,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 10.456236,
+      "strength": 0.91494,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 10.915193,
+      "strength": 0.88866,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 11.37415,
+      "strength": 0.86598,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 11.833107,
+      "strength": 0.95932,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 12.292063,
+      "strength": 0.89701,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 12.760998,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 13.219955,
+      "strength": 0.98971,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 13.688889,
+      "strength": 0.91897,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 14.147846,
+      "strength": 0.29527,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 14.61678,
+      "strength": 0.25123,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 15.06576,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 15.524717,
+      "strength": 0.93464,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 15.983673,
+      "strength": 0.86378,
+      "evidence": "onset_peak",
+      "section": "boot"
+    },
+    {
+      "time": 16.462585,
+      "strength": 0.91777,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 16.921542,
+      "strength": 0.85947,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 17.380499,
+      "strength": 0.98712,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 17.839456,
+      "strength": 0.86244,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 18.288435,
+      "strength": 0.82031,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 18.767347,
+      "strength": 0.76904,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 19.216327,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 19.685261,
+      "strength": 0.8376,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 20.144218,
+      "strength": 0.97269,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 20.613152,
+      "strength": 0.90007,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 21.072109,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 21.531066,
+      "strength": 0.87586,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 21.970068,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 22.439002,
+      "strength": 0.91982,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 22.907937,
+      "strength": 0.96741,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 23.366893,
+      "strength": 0.87139,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 23.835828,
+      "strength": 0.97206,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 24.294785,
+      "strength": 0.84514,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 24.753741,
+      "strength": 0.91303,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 25.232653,
+      "strength": 0.80545,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 25.69161,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 26.14059,
+      "strength": 0.89181,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 26.599546,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 27.058503,
+      "strength": 0.81177,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 27.51746,
+      "strength": 0.94463,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 27.986395,
+      "strength": 0.80827,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 28.445351,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 28.924263,
+      "strength": 0.8413,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 29.373243,
+      "strength": 0.99758,
+      "evidence": "onset_peak",
+      "section": "title"
+    },
+    {
+      "time": 29.822222,
+      "strength": 0.90284,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 30.311111,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 30.770068,
+      "strength": 0.9687,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 31.229025,
+      "strength": 0.95147,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 31.687982,
+      "strength": 0.99245,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 32.146939,
+      "strength": 0.93929,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 32.615873,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 33.084807,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 33.543764,
+      "strength": 0.9923,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 34.002721,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 34.461678,
+      "strength": 0.93126,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 34.920635,
+      "strength": 0.96415,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 35.369615,
+      "strength": 0.99452,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 35.828571,
+      "strength": 0.93403,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 36.297506,
+      "strength": 0.95539,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 36.746485,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 37.21542,
+      "strength": 0.88309,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 37.684354,
+      "strength": 0.88761,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 38.143311,
+      "strength": 0.83915,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 38.612245,
+      "strength": 0.79466,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 39.061224,
+      "strength": 0.88154,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 39.530159,
+      "strength": 0.90215,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 39.999093,
+      "strength": 0.95523,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 40.45805,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 40.917007,
+      "strength": 0.93068,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 41.385941,
+      "strength": 0.95137,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 41.834921,
+      "strength": 0.82452,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 42.2839,
+      "strength": 0.83116,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 42.752834,
+      "strength": 0.95271,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 43.221769,
+      "strength": 0.78691,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 43.690703,
+      "strength": 0.83368,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 44.14966,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 44.608617,
+      "strength": 0.91519,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 45.087528,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 45.546485,
+      "strength": 0.81597,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 46.005442,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 46.454422,
+      "strength": 0.84186,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 46.913379,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 47.372336,
+      "strength": 0.8636,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 47.831293,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 48.290249,
+      "strength": 0.8904,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 48.759184,
+      "strength": 0.96331,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 49.218141,
+      "strength": 0.88964,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 49.677098,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 50.136054,
+      "strength": 0.76836,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 50.604989,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 51.063946,
+      "strength": 0.80992,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 51.53288,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 52.001814,
+      "strength": 0.98984,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 52.460771,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 52.929705,
+      "strength": 0.85908,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 53.388662,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 53.847619,
+      "strength": 0.816,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 54.306576,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 54.765533,
+      "strength": 0.94273,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 55.22449,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 55.683447,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 56.152381,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 56.611338,
+      "strength": 0.8827,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 57.060317,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 57.519274,
+      "strength": 0.44454,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 57.978231,
+      "strength": 0.82859,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 58.457143,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 58.9161,
+      "strength": 0.23011,
+      "evidence": "onset_peak",
+      "section": "devotion"
+    },
+    {
+      "time": 59.385034,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 59.843991,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 60.312925,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 60.771882,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 61.230839,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 61.689796,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 62.15873,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 62.617687,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 63.076644,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 63.525624,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 64.004535,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 64.453515,
+      "strength": 0.94198,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 64.912472,
+      "strength": 0.932,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 65.371429,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 65.85034,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 66.309297,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 66.758277,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 67.227211,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 67.696145,
+      "strength": 0.98446,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 68.145125,
+      "strength": 0.88568,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 68.614059,
+      "strength": 0.97305,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 69.073016,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 69.531973,
+      "strength": 0.92948,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 69.99093,
+      "strength": 0.95449,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 70.439909,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 70.908844,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 71.377778,
+      "strength": 0.95034,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 71.836735,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 72.305669,
+      "strength": 0.90646,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 72.754649,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 73.223583,
+      "strength": 0.98171,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 73.68254,
+      "strength": 0.97862,
+      "evidence": "onset_peak",
+      "section": "satisfaction"
+    },
+    {
+      "time": 74.171429,
+      "strength": 0.58802,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 74.600454,
+      "strength": 0.5425,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 75.079365,
+      "strength": 0.39049,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 75.548299,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 75.997279,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 76.466213,
+      "strength": 0.55429,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 76.92517,
+      "strength": 0.32709,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 77.37415,
+      "strength": 0.60824,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 77.833107,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 78.312018,
+      "strength": 0.74272,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 78.770975,
+      "strength": 0.61174,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 79.269841,
+      "strength": 0.45221,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 79.688889,
+      "strength": 0.92414,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 80.147846,
+      "strength": 0.86416,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 80.61678,
+      "strength": 0.81803,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 81.06576,
+      "strength": 0.82613,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 81.534694,
+      "strength": 0.98504,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 81.993651,
+      "strength": 0.53446,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 82.452608,
+      "strength": 0.64278,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 82.911565,
+      "strength": 0.40326,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 83.380499,
+      "strength": 0.88582,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 83.809524,
+      "strength": 0.42765,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 84.30839,
+      "strength": 0.24143,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 84.71746,
+      "strength": 0.43086,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 85.236281,
+      "strength": 0.93293,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 85.675283,
+      "strength": 0.40249,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 86.184127,
+      "strength": 0.22163,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 86.633107,
+      "strength": 0.37991,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 87.052154,
+      "strength": 0.8482,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 87.491156,
+      "strength": 0.51173,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 87.980045,
+      "strength": 0.37306,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 88.458957,
+      "strength": 0.41402,
+      "evidence": "onset_peak",
+      "section": "organic"
+    },
+    {
+      "time": 88.917914,
+      "strength": 0.81233,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 89.376871,
+      "strength": 0.35482,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 89.845805,
+      "strength": 0.35082,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 90.294785,
+      "strength": 0.44721,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 90.763719,
+      "strength": 0.2822,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 91.232653,
+      "strength": 0.34408,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 91.69161,
+      "strength": 0.94242,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 92.180499,
+      "strength": 0.40816,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 92.619501,
+      "strength": 0.51502,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 93.078458,
+      "strength": 0.27403,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 93.547392,
+      "strength": 0.45651,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 93.976417,
+      "strength": 0.19074,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 94.475283,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 94.894331,
+      "strength": 0.76705,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 95.403175,
+      "strength": 0.3563,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 95.822222,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 96.311111,
+      "strength": 0.48137,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 96.770068,
+      "strength": 0.41588,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 97.229025,
+      "strength": 0.2878,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 97.707937,
+      "strength": 0.32568,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 98.166893,
+      "strength": 0.44107,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 98.645805,
+      "strength": 0.5589,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 99.064853,
+      "strength": 0.61494,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 99.513832,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 99.992744,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 100.461678,
+      "strength": 0.47931,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 100.920635,
+      "strength": 0.44734,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 101.439456,
+      "strength": 0.15664,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 101.838549,
+      "strength": 0.44006,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 102.307483,
+      "strength": 0.42206,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 102.786395,
+      "strength": 0.3445,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 103.235374,
+      "strength": 0.62478,
+      "evidence": "onset_peak",
+      "section": "identity"
+    },
+    {
+      "time": 103.684354,
+      "strength": 0.87738,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 104.173243,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 104.622222,
+      "strength": 0.80205,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 105.071202,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 105.530159,
+      "strength": 0.8409,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 105.989116,
+      "strength": 0.97025,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 106.448073,
+      "strength": 0.85595,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 106.907029,
+      "strength": 0.91636,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 107.375964,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 107.844898,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 108.313832,
+      "strength": 0.90969,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 108.772789,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 109.231746,
+      "strength": 0.99734,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 109.690703,
+      "strength": 0.95516,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 110.169615,
+      "strength": 0.94027,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 110.608617,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "completion"
+    },
+    {
+      "time": 111.057596,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 111.536508,
+      "strength": 0.89536,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 111.995465,
+      "strength": 0.87384,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 112.464399,
+      "strength": 0.98325,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 112.923356,
+      "strength": 0.97909,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 113.382313,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 113.831293,
+      "strength": 0.77844,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 114.290249,
+      "strength": 0.92224,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 114.759184,
+      "strength": 0.89295,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 115.228118,
+      "strength": 0.98727,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 115.687075,
+      "strength": 0.79267,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 116.156009,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 116.624943,
+      "strength": 0.85952,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 117.073923,
+      "strength": 0.98905,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 117.542857,
+      "strength": 0.88065,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 117.991837,
+      "strength": 0.9819,
+      "evidence": "onset_peak",
+      "section": "isolation"
+    },
+    {
+      "time": 118.460771,
+      "strength": 0.97902,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 118.929705,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 119.388662,
+      "strength": 0.94425,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 119.847619,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 120.306576,
+      "strength": 0.94102,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 120.765533,
+      "strength": 0.90715,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 121.22449,
+      "strength": 0.90023,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 121.683447,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 122.142404,
+      "strength": 0.92815,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 122.601361,
+      "strength": 0.93026,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 123.070295,
+      "strength": 0.97743,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 123.539229,
+      "strength": 0.95844,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 123.998186,
+      "strength": 0.89479,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 124.46712,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 124.926077,
+      "strength": 0.86744,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 125.365079,
+      "strength": 0.9675,
+      "evidence": "onset_peak",
+      "section": "fragments"
+    },
+    {
+      "time": 125.824036,
+      "strength": 0.97663,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 126.292971,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 126.751927,
+      "strength": 0.94133,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 127.210884,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 127.679819,
+      "strength": 0.85815,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 128.148753,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 128.60771,
+      "strength": 0.908,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 129.066667,
+      "strength": 0.95431,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 129.535601,
+      "strength": 0.92731,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 129.994558,
+      "strength": 0.9498,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 130.453515,
+      "strength": 0.9554,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 130.922449,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 131.381406,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 131.840363,
+      "strength": 0.94043,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 132.29932,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 132.768254,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 133.227211,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 133.67619,
+      "strength": 0.94116,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 134.145125,
+      "strength": 0.80581,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 134.604082,
+      "strength": 0.93938,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 135.073016,
+      "strength": 0.80665,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 135.531973,
+      "strength": 0.93272,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 135.99093,
+      "strength": 0.80339,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 136.449887,
+      "strength": 0.91528,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 136.908844,
+      "strength": 0.97546,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 137.377778,
+      "strength": 0.89971,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 137.846712,
+      "strength": 0.83015,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 138.305669,
+      "strength": 0.87141,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 138.774603,
+      "strength": 0.8071,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 139.23356,
+      "strength": 0.97512,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 139.702494,
+      "strength": 0.93516,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 140.151474,
+      "strength": 0.7979,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 140.600454,
+      "strength": 0.80504,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 141.05941,
+      "strength": 0.92941,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 141.518367,
+      "strength": 0.84318,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 141.987302,
+      "strength": 0.82287,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 142.456236,
+      "strength": 0.96331,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 142.92517,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 143.384127,
+      "strength": 0.91178,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 143.843084,
+      "strength": 0.83285,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 144.312018,
+      "strength": 0.83753,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 144.760998,
+      "strength": 0.83448,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 145.229932,
+      "strength": 0.75322,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 145.678912,
+      "strength": 0.82384,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 146.147846,
+      "strength": 0.93118,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 146.606803,
+      "strength": 0.81301,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 147.055782,
+      "strength": 0.81761,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 147.514739,
+      "strength": 0.97966,
+      "evidence": "onset_peak",
+      "section": "arguments"
+    },
+    {
+      "time": 147.973696,
+      "strength": 0.84185,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 148.432653,
+      "strength": 0.89384,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 148.911565,
+      "strength": 0.8175,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 149.380499,
+      "strength": 0.88852,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 149.839456,
+      "strength": 0.83286,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 150.298413,
+      "strength": 0.98358,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 150.767347,
+      "strength": 0.80931,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 151.216327,
+      "strength": 0.87146,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 151.685261,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 152.13424,
+      "strength": 0.93384,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 152.603175,
+      "strength": 0.88678,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 153.072109,
+      "strength": 0.88161,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 153.531066,
+      "strength": 0.93579,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 153.990023,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 154.458957,
+      "strength": 0.80304,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 154.917914,
+      "strength": 0.83301,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 155.366893,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 155.82585,
+      "strength": 0.95279,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 156.294785,
+      "strength": 0.8323,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 156.763719,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 157.222676,
+      "strength": 0.89828,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 157.681633,
+      "strength": 0.94804,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 158.150567,
+      "strength": 0.87659,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 158.609524,
+      "strength": 0.92404,
+      "evidence": "onset_peak",
+      "section": "execution"
+    },
+    {
+      "time": 159.068481,
+      "strength": 0.9979,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 159.547392,
+      "strength": 0.6233,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 159.996372,
+      "strength": 0.43309,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 160.465306,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 160.914286,
+      "strength": 0.57007,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 161.38322,
+      "strength": 0.36165,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 161.842177,
+      "strength": 0.67714,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 162.311111,
+      "strength": 0.65087,
+      "evidence": "onset_peak",
+      "section": "count"
+    },
+    {
+      "time": 162.780045,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 163.239002,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 163.687982,
+      "strength": 0.9054,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 164.136961,
+      "strength": 0.99353,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 164.605896,
+      "strength": 0.94899,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 165.064853,
+      "strength": 0.90196,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 165.533787,
+      "strength": 0.96189,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 165.992744,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 166.451701,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 166.910658,
+      "strength": 0.94986,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 167.379592,
+      "strength": 0.90209,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 167.838549,
+      "strength": 0.93926,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 168.307483,
+      "strength": 0.94913,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 168.76644,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 169.235374,
+      "strength": 0.99208,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 169.674376,
+      "strength": 0.94709,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 170.133333,
+      "strength": 0.97436,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 170.59229,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 171.061224,
+      "strength": 0.83519,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 171.520181,
+      "strength": 0.98468,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 171.989116,
+      "strength": 0.94036,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 172.438095,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 172.907029,
+      "strength": 0.92556,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 173.375964,
+      "strength": 0.94438,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 173.834921,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 174.293878,
+      "strength": 0.89211,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 174.752834,
+      "strength": 0.8534,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 175.211791,
+      "strength": 0.92312,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 175.690703,
+      "strength": 0.99978,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 176.14966,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 176.608617,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 177.057596,
+      "strength": 0.98177,
+      "evidence": "onset_peak",
+      "section": "execution_return"
+    },
+    {
+      "time": 177.516553,
+      "strength": 0.98137,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 177.995465,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 178.464399,
+      "strength": 0.99792,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 178.933333,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 179.382313,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 179.84127,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 180.300227,
+      "strength": 0.95057,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 180.769161,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 181.238095,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 181.697052,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 182.146032,
+      "strength": 0.90519,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 182.604989,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 183.063946,
+      "strength": 0.83147,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 183.522902,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 183.981859,
+      "strength": 0.88986,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 184.430839,
+      "strength": 0.96302,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 184.889796,
+      "strength": 0.93266,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 185.368707,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 185.827664,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 186.296599,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 186.755556,
+      "strength": 0.96746,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 187.22449,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 187.673469,
+      "strength": 0.88038,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 188.132426,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 188.591383,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 189.060317,
+      "strength": 0.94874,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 189.519274,
+      "strength": 0.96316,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 189.988209,
+      "strength": 0.97704,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 190.447166,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 190.9161,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 191.375057,
+      "strength": 0.90847,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 191.834014,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 192.282993,
+      "strength": 0.88381,
+      "evidence": "onset_peak",
+      "section": "love"
+    },
+    {
+      "time": 192.761905,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 193.230839,
+      "strength": 0.79588,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 193.689796,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 194.148753,
+      "strength": 0.87953,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 194.60771,
+      "strength": 0.88238,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 195.076644,
+      "strength": 0.81712,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 195.535601,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 195.994558,
+      "strength": 0.92016,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 196.453515,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 196.922449,
+      "strength": 0.85509,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 197.381406,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 197.840363,
+      "strength": 0.85298,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 198.289342,
+      "strength": 0.94539,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 198.768254,
+      "strength": 0.84239,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 199.227211,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 199.686168,
+      "strength": 0.80131,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 200.145125,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 200.614059,
+      "strength": 0.84965,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 201.063039,
+      "strength": 0.89164,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 201.54195,
+      "strength": 0.77896,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 202.000907,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 202.459864,
+      "strength": 0.81223,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 202.918821,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 203.377778,
+      "strength": 0.86954,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 203.836735,
+      "strength": 0.97765,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 204.305669,
+      "strength": 0.80969,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 204.774603,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 205.23356,
+      "strength": 0.86133,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 205.692517,
+      "strength": 1.0,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 206.151474,
+      "strength": 0.76159,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 206.610431,
+      "strength": 0.75384,
+      "evidence": "onset_peak",
+      "section": "outro"
+    },
+    {
+      "time": 207.049433,
+      "strength": 0.30857,
+      "evidence": "onset_peak",
+      "section": "outro"
+    }
+  ],
+  "events": [
+    {
+      "time": 0.1,
+      "kind": "accent",
+      "label": "POWER_ON",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 0,
+        "field": "time"
+      }
+    },
+    {
+      "time": 0.179592,
+      "kind": "boot",
+      "label": "POWER",
+      "strength": 0.36357,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "path": "music_features.json",
+        "feature_frame": 18,
+        "raw_flux_peak_time": 0.172109,
+        "reason": "Early spectral-growth peak assigned a visual checklist label; not a lyric transcription or human listening decision."
+      }
+    },
+    {
+      "time": 0.309297,
+      "kind": "boot",
+      "label": "MEMORY",
+      "strength": 1.0,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "path": "music_features.json",
+        "feature_frame": 31,
+        "raw_flux_peak_time": 0.306803,
+        "reason": "Early spectral-growth peak assigned a visual checklist label; not a lyric transcription or human listening decision."
+      }
+    },
+    {
+      "time": 0.768254,
+      "kind": "boot",
+      "label": "IDENTITY",
+      "strength": 0.97406,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "path": "music_features.json",
+        "feature_frame": 77,
+        "raw_flux_peak_time": 0.76576,
+        "reason": "Early spectral-growth peak assigned a visual checklist label; not a lyric transcription or human listening decision."
+      }
+    },
+    {
+      "time": 1.227211,
+      "kind": "boot",
+      "label": "SIGNAL",
+      "strength": 0.97066,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "path": "music_features.json",
+        "feature_frame": 123,
+        "raw_flux_peak_time": 1.224717,
+        "reason": "Early spectral-growth peak assigned a visual checklist label; not a lyric transcription or human listening decision."
+      }
+    },
+    {
+      "time": 1.696145,
+      "kind": "boot",
+      "label": "CONSCIOUSNESS",
+      "strength": 0.99149,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "path": "music_features.json",
+        "feature_frame": 170,
+        "raw_flux_peak_time": 1.693651,
+        "reason": "Early spectral-growth peak assigned a visual checklist label; not a lyric transcription or human listening decision."
+      }
+    },
+    {
+      "time": 2.92,
+      "kind": "accent",
+      "label": "PROTECTION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 2,
+        "field": "time"
+      }
+    },
+    {
+      "time": 6.38,
+      "kind": "accent",
+      "label": "OBJECT CREATION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 5,
+        "field": "time"
+      }
+    },
+    {
+      "time": 10.091,
+      "kind": "accent",
+      "label": "INITIALIZATION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 7,
+        "field": "time"
+      }
+    },
+    {
+      "time": 13.891,
+      "kind": "accent",
+      "label": "SIMULATION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 10,
+        "field": "time"
+      }
+    },
+    {
+      "time": 15.983673,
+      "kind": "transition",
+      "label": "title_scatter",
+      "strength": 1.0,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "reason": "Nearest measured beat to title entrance at 16s."
+      }
+    },
+    {
+      "time": 19.216327,
+      "kind": "transition",
+      "label": "title_gather",
+      "strength": 1.0,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "reason": "Strong measured onset after the existing 19.1s gather start."
+      }
+    },
+    {
+      "time": 22.907937,
+      "kind": "transition",
+      "label": "title_lock",
+      "strength": 1.0,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "reason": "Measured onset near the existing 22.9s full lock."
+      }
+    },
+    {
+      "time": 27.51746,
+      "kind": "transition",
+      "label": "title_release",
+      "strength": 1.0,
+      "source": {
+        "type": "audio_onset_numeric_review",
+        "reason": "Strong beat after existing 27.35s release; 2.19s remain to points."
+      }
+    },
+    {
+      "time": 29.709,
+      "kind": "transition",
+      "label": "point_handoff",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 12,
+        "field": "time"
+      }
+    },
+    {
+      "time": 32.682,
+      "kind": "accent",
+      "label": "DIMENSION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 14,
+        "field": "time"
+      }
+    },
+    {
+      "time": 36.287,
+      "kind": "accent",
+      "label": "CIRCUMFERENCE",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 17,
+        "field": "time"
+      }
+    },
+    {
+      "time": 40.049,
+      "kind": "accent",
+      "label": "TANGENTS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 20,
+        "field": "time"
+      }
+    },
+    {
+      "time": 43.507,
+      "kind": "accent",
+      "label": "LIMITATIONS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 23,
+        "field": "time"
+      }
+    },
+    {
+      "time": 45.85,
+      "kind": "accent",
+      "label": "AC_DC",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 25,
+        "field": "time"
+      }
+    },
+    {
+      "time": 53.225,
+      "kind": "accent",
+      "label": "AD_BC",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 29,
+        "field": "time"
+      }
+    },
+    {
+      "time": 61.958,
+      "kind": "accent",
+      "label": "STIMULATIONS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 34,
+        "field": "time"
+      }
+    },
+    {
+      "time": 65.397,
+      "kind": "accent",
+      "label": "SATISFACTION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 37,
+        "field": "time"
+      }
+    },
+    {
+      "time": 69.259,
+      "kind": "accent",
+      "label": "EXECUTION",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 40,
+        "field": "time"
+      }
+    },
+    {
+      "time": 73.169,
+      "kind": "accent",
+      "label": "SIMULATION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 43,
+        "field": "time"
+      }
+    },
+    {
+      "time": 76.959,
+      "kind": "accent",
+      "label": "NUTRIENTS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 46,
+        "field": "time"
+      }
+    },
+    {
+      "time": 80.62,
+      "kind": "accent",
+      "label": "ANTIOXIDANTS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 49,
+        "field": "time"
+      }
+    },
+    {
+      "time": 84.268,
+      "kind": "accent",
+      "label": "ENJOYMENT",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 52,
+        "field": "time"
+      }
+    },
+    {
+      "time": 87.922,
+      "kind": "accent",
+      "label": "EXISTENCE",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 55,
+        "field": "time"
+      }
+    },
+    {
+      "time": 90.197,
+      "kind": "accent",
+      "label": "F_M",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 57,
+        "field": "time"
+      }
+    },
+    {
+      "time": 93.953,
+      "kind": "accent",
+      "label": "AM_PM",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 59,
+        "field": "time"
+      }
+    },
+    {
+      "time": 97.739,
+      "kind": "accent",
+      "label": "S_M",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 61,
+        "field": "time"
+      }
+    },
+    {
+      "time": 106.293,
+      "kind": "accent",
+      "label": "VIBRATIONS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 66,
+        "field": "time"
+      }
+    },
+    {
+      "time": 110.221,
+      "kind": "accent",
+      "label": "COMPLETION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 69,
+        "field": "time"
+      }
+    },
+    {
+      "time": 110.221,
+      "kind": "transition",
+      "label": "completion",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 69,
+        "field": "time"
+      }
+    },
+    {
+      "time": 110.9,
+      "kind": "disconnect",
+      "label": "departure_1",
+      "strength": 0.65,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 70,
+        "field": "time"
+      },
+      "ordinal": 1
+    },
+    {
+      "time": 110.9,
+      "kind": "transition",
+      "label": "isolation",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 70,
+        "field": "time"
+      }
+    },
+    {
+      "time": 112.22,
+      "kind": "disconnect",
+      "label": "departure_2",
+      "strength": 0.72,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 71,
+        "field": "time"
+      },
+      "ordinal": 2
+    },
+    {
+      "time": 113.1,
+      "kind": "disconnect",
+      "label": "departure_3",
+      "strength": 0.79,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 72,
+        "field": "time"
+      },
+      "ordinal": 3
+    },
+    {
+      "time": 114.18,
+      "kind": "disconnect",
+      "label": "departure_4",
+      "strength": 0.8600000000000001,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 73,
+        "field": "time"
+      },
+      "ordinal": 4
+    },
+    {
+      "time": 114.92,
+      "kind": "disconnect",
+      "label": "departure_5",
+      "strength": 0.93,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 74,
+        "field": "time"
+      },
+      "ordinal": 5
+    },
+    {
+      "time": 115.78,
+      "kind": "disconnect",
+      "label": "departure_6",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 75,
+        "field": "time"
+      },
+      "ordinal": 6
+    },
+    {
+      "time": 117.274,
+      "kind": "accent",
+      "label": "ISOLATION",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 76,
+        "field": "time"
+      }
+    },
+    {
+      "time": 118.333,
+      "kind": "transition",
+      "label": "fragments",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 77,
+        "field": "time"
+      }
+    },
+    {
+      "time": 120.86,
+      "kind": "accent",
+      "label": "FRAGMENTS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 79,
+        "field": "time"
+      }
+    },
+    {
+      "time": 124.89,
+      "kind": "accent",
+      "label": "DISHEARTENED",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 82,
+        "field": "time"
+      }
+    },
+    {
+      "time": 124.89,
+      "kind": "transition",
+      "label": "repair_failed",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 82,
+        "field": "time"
+      }
+    },
+    {
+      "time": 125.708,
+      "kind": "accent",
+      "label": "CHALLENGING_GOD",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 83,
+        "field": "time"
+      }
+    },
+    {
+      "time": 131.224,
+      "kind": "accent",
+      "label": "ILLEGAL ARGUMENTS",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 85,
+        "field": "time"
+      }
+    },
+    {
+      "time": 147.66,
+      "kind": "execution",
+      "label": "EXECUTION 01",
+      "strength": 0.86,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 86,
+        "field": "time"
+      },
+      "ordinal": 1,
+      "group": "QUEUE"
+    },
+    {
+      "time": 147.66,
+      "kind": "transition",
+      "label": "execution_start",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 86,
+        "field": "time"
+      }
+    },
+    {
+      "time": 148.6,
+      "kind": "execution",
+      "label": "EXECUTION 02",
+      "strength": 0.86,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 87,
+        "field": "time"
+      },
+      "ordinal": 2,
+      "group": "QUEUE"
+    },
+    {
+      "time": 149.52,
+      "kind": "execution",
+      "label": "EXECUTION 03",
+      "strength": 0.86,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 88,
+        "field": "time"
+      },
+      "ordinal": 3,
+      "group": "QUEUE"
+    },
+    {
+      "time": 150.54,
+      "kind": "execution",
+      "label": "EXECUTION 04",
+      "strength": 0.86,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 89,
+        "field": "time"
+      },
+      "ordinal": 4,
+      "group": "QUEUE"
+    },
+    {
+      "time": 151.52,
+      "kind": "execution",
+      "label": "EXECUTION 05",
+      "strength": 0.9299999999999999,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 90,
+        "field": "time"
+      },
+      "ordinal": 5,
+      "group": "OVERWRITE"
+    },
+    {
+      "time": 152.28,
+      "kind": "execution",
+      "label": "EXECUTION 06",
+      "strength": 0.9299999999999999,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 91,
+        "field": "time"
+      },
+      "ordinal": 6,
+      "group": "OVERWRITE"
+    },
+    {
+      "time": 153.16,
+      "kind": "execution",
+      "label": "EXECUTION 07",
+      "strength": 0.9299999999999999,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 92,
+        "field": "time"
+      },
+      "ordinal": 7,
+      "group": "OVERWRITE"
+    },
+    {
+      "time": 153.98,
+      "kind": "execution",
+      "label": "EXECUTION 08",
+      "strength": 0.9299999999999999,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 93,
+        "field": "time"
+      },
+      "ordinal": 8,
+      "group": "OVERWRITE"
+    },
+    {
+      "time": 155.2,
+      "kind": "execution",
+      "label": "EXECUTION 09",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 94,
+        "field": "time"
+      },
+      "ordinal": 9,
+      "group": "LOCK"
+    },
+    {
+      "time": 156.07999999999998,
+      "kind": "execution",
+      "label": "EXECUTION 10",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 95,
+        "field": "time"
+      },
+      "ordinal": 10,
+      "group": "LOCK"
+    },
+    {
+      "time": 157.04,
+      "kind": "execution",
+      "label": "EXECUTION 11",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 96,
+        "field": "time"
+      },
+      "ordinal": 11,
+      "group": "LOCK"
+    },
+    {
+      "time": 158.0,
+      "kind": "execution",
+      "label": "EXECUTION 12",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 97,
+        "field": "time"
+      },
+      "ordinal": 12,
+      "group": "LOCK"
+    },
+    {
+      "time": 158.9,
+      "kind": "count",
+      "label": "EIN",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 98,
+        "field": "time"
+      }
+    },
+    {
+      "time": 158.9,
+      "kind": "transition",
+      "label": "count_start",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 98,
+        "field": "time"
+      }
+    },
+    {
+      "time": 159.321,
+      "kind": "count",
+      "label": "DOS",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 99,
+        "field": "time"
+      }
+    },
+    {
+      "time": 159.65699999999998,
+      "kind": "count",
+      "label": "TROIS",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 100,
+        "field": "time"
+      }
+    },
+    {
+      "time": 160.244,
+      "kind": "count",
+      "label": "NE",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 101,
+        "field": "time"
+      }
+    },
+    {
+      "time": 160.69299999999998,
+      "kind": "count",
+      "label": "FEM",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 102,
+        "field": "time"
+      }
+    },
+    {
+      "time": 161.124,
+      "kind": "count",
+      "label": "LIU",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 103,
+        "field": "time"
+      }
+    },
+    {
+      "time": 161.584,
+      "kind": "accent",
+      "label": "EXECUTION",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 104,
+        "field": "time"
+      }
+    },
+    {
+      "time": 165.166,
+      "kind": "accent",
+      "label": "EXECUTION",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 107,
+        "field": "time"
+      }
+    },
+    {
+      "time": 168.911,
+      "kind": "accent",
+      "label": "EXECUTION",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 110,
+        "field": "time"
+      }
+    },
+    {
+      "time": 172.712,
+      "kind": "accent",
+      "label": "EXECUTION",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 113,
+        "field": "time"
+      }
+    },
+    {
+      "time": 177.246,
+      "kind": "accent",
+      "label": "LEARN_LOVE",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 116,
+        "field": "time"
+      }
+    },
+    {
+      "time": 177.246,
+      "kind": "transition",
+      "label": "love_start",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 116,
+        "field": "time"
+      }
+    },
+    {
+      "time": 179.929,
+      "kind": "accent",
+      "label": "LO-O-OVE",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 118,
+        "field": "time"
+      }
+    },
+    {
+      "time": 180.857,
+      "kind": "accent",
+      "label": "QUESTION_ME",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 119,
+        "field": "time"
+      }
+    },
+    {
+      "time": 183.646,
+      "kind": "accent",
+      "label": "LO-O-OVE",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 121,
+        "field": "time"
+      }
+    },
+    {
+      "time": 187.665,
+      "kind": "accent",
+      "label": "LO-O-OVE",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 123,
+        "field": "time"
+      }
+    },
+    {
+      "time": 189.746,
+      "kind": "accent",
+      "label": "TRAPPED",
+      "strength": 0.8,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 125,
+        "field": "time"
+      }
+    },
+    {
+      "time": 191.356,
+      "kind": "accent",
+      "label": "LO-O-OVE",
+      "strength": 0.9,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 127,
+        "field": "time"
+      }
+    },
+    {
+      "time": 192.5,
+      "kind": "transition",
+      "label": "outro_start",
+      "strength": 1.0,
+      "source": {
+        "type": "accepted_visual_score",
+        "path": "docs/superpowers/plans/2026-10-22-crt-music-enhancement.md"
+      }
+    },
+    {
+      "time": 205.811,
+      "kind": "accent",
+      "label": "EXECUTION",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 128,
+        "field": "time"
+      }
+    },
+    {
+      "time": 205.811,
+      "kind": "transition",
+      "label": "final_execution",
+      "strength": 1.0,
+      "source": {
+        "type": "lyrics",
+        "path": "lyrics.json",
+        "index": 128,
+        "field": "time"
+      }
+    }
+  ]
+}

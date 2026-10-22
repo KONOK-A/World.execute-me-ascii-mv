@@ -35,8 +35,13 @@ class ConsoleTests(unittest.TestCase):
             self.assertEqual(data['before'], data['after'])
             self.assertTrue(data['stdout_restored'])
             frames = json.loads(report.with_suffix('.frames.json').read_text(encoding='utf-8'))
+            self.assertEqual(frames['fps'], 30)
             self.assertGreater(frames['frames'], 1)
             self.assertGreaterEqual(frames['last_time'], .4)
+            self.assertGreater(frames['output_bytes'],0)
+            self.assertEqual(sum(frames['frame_kinds'].values()),frames['frames'])
+            for stage in ('draw','encode','write','total'):
+                self.assertGreaterEqual(frames['timings_ms'][stage]['p95'],0)
             audio.unlink()  # The helper must release the file before the player returns.
 
     def test_keys_timeout_and_console_restoration(self):

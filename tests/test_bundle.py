@@ -37,6 +37,8 @@ class BundleTests(unittest.TestCase):
             self.assertEqual(manifest['sys_platform'], sys.platform)
             self.assertIn('media/song.wav', manifest['files'])
             self.assertIn('terminal.py', manifest['files'])
+            for required in ('music.py','render_output.py','music_features.json','score.json'):
+                self.assertIn(required,manifest['files'])
             self.assertIn('windows_audio.ps1' if sys.platform == 'win32' else 'audio-clock', manifest['files'])
             for name, digest in manifest['files'].items():
                 self.assertEqual(hashlib.sha256(archive.read(name)).hexdigest(), digest)
@@ -106,6 +108,23 @@ class BundleTests(unittest.TestCase):
         launcher = '运行单文件.cmd' if sys.platform == 'win32' else '运行单文件.command'
         with zipfile.ZipFile(self.output/f'world-execute-mv-{suffix}.zip') as archive:
             self.assertIn('world-execute-mv/'+launcher, archive.namelist())
+            if sys.platform == 'win32':
+                for name in ('ensure-runtime.ps1', 'python-runtime.json'):
+                    self.assertEqual(archive.read('world-execute-mv/'+name), (ROOT/name).read_bytes())
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Windows launcher')
+    def test_distribution_launcher_runs_with_special_paths(self):
+        with tempfile.TemporaryDirectory(prefix='mv 启动 (test); ') as folder:
+            with zipfile.ZipFile(self.output/'world-execute-mv-windows.zip') as archive:
+                archive.extractall(folder)
+            launcher = Path(folder)/'world-execute-mv/运行单文件.cmd'
+            result = subprocess.run(
+                [str(launcher), '--snapshot', '67.3', '--plain', '--audio',
+                 r'D:\音乐\Mili - world.execute (me) ;.mp3'],
+                input='', capture_output=True, encoding='utf-8', timeout=30,
+                env=dict(os.environ, PYTHONHOME=str(Path(folder)/'missing Python')))
+            self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+            self.assertIn('If I can make you happy', result.stdout)
 
     @unittest.skipUnless(sys.platform == 'win32', 'Windows console APIs')
     def test_bundled_audio_and_full_player(self):
