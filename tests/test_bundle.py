@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -122,6 +123,37 @@ class BundleTests(unittest.TestCase):
         with zipfile.ZipFile(self.output/f'world-execute-mv-{suffix}.zip') as archive:
             self.assertIn('world-execute-mv/LICENSE', archive.namelist())
             self.assertEqual(archive.read('world-execute-mv/LICENSE'), license_text)
+
+    def test_default_audio_uses_config_and_preserves_lossless_pcm(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            source = base/'source'
+            source.mkdir()
+            with zipfile.ZipFile(self.bundle) as archive:
+                archive.extractall(source)
+            audio = source/'media/lossless source.wav'
+            (source/'media/song.wav').rename(audio)
+            config = json.loads((source/'config.json').read_text(encoding='utf-8'))
+            config['audio'] = 'media/lossless source.wav'
+            (source/'config.json').write_text(json.dumps(config), encoding='utf-8')
+            support = ['tools/build_bundle.py', 'tools/bundle_main.py', 'README.md',
+                       'docs/images/mv-cover.png']
+            support += (['运行单文件.cmd', 'ensure-runtime.ps1', 'python-runtime.json']
+                        if sys.platform == 'win32' else
+                        ['运行单文件.command', 'AudioClock.swift', 'build-audio.sh'])
+            for name in support:
+                target = source/name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT/name, target)
+            output = base/'output'
+            result = subprocess.run(
+                [sys.executable, '-B', '-X', 'utf8', str(source/'tools/build_bundle.py'),
+                 '--output', str(output)], cwd=base, capture_output=True, encoding='utf-8', timeout=120)
+            self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+            with zipfile.ZipFile(output/'world-execute-mv.pyz') as archive:
+                self.assertEqual(archive.read('media/song.wav'), self.audio.read_bytes())
+                self.assertNotIn('media/song.mp3', archive.namelist())
+                self.assertEqual(json.loads(archive.read('config.json'))['audio'], 'media/song.wav')
 
     @unittest.skipUnless(sys.platform == 'win32', 'Windows launcher')
     def test_distribution_launcher_runs_with_special_paths(self):

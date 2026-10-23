@@ -284,7 +284,7 @@ def timing_summary(values):
 def play(args,film,terminal):
     audio_path=Path(args.audio).expanduser().resolve() if args.audio else Path(film.config['audio'])
     if not args.audio and not audio_path.is_absolute():audio_path=ROOT/audio_path
-    if not audio_path.is_file():raise RuntimeError(f'找不到音频：{audio_path}\n请使用 --audio 指定 MP3 文件。')
+    if not audio_path.is_file():raise RuntimeError(f'找不到音频：{audio_path}\n请使用 --audio 指定音频文件。')
     audio=Audio(audio_path)
     offset=args.offset if args.offset is not None else film.config.get('subtitle_offset',0.)
     started=args.autoplay or args.paused; paused=not args.autoplay; help_on=False; volume=.75; ready=not started

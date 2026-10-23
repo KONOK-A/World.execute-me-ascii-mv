@@ -19,7 +19,7 @@ def build(audio, output):
     audio = Path(audio).expanduser().resolve()
     output = Path(output).expanduser().resolve()
     if not audio.is_file():
-        raise SystemExit('请先将本地音频放入 media/song.mp3，或用 --audio 指定音频文件。')
+        raise SystemExit(f'找不到音频：{audio}\n请按 config.json 的 audio 路径准备音频，或用 --audio 指定音频文件。')
     if sys.platform not in ('win32', 'darwin'):
         raise SystemExit('请在 Windows 或 macOS 上构建对应平台的播放包。')
     windows = sys.platform == 'win32'
@@ -72,10 +72,15 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--audio', type=Path, default=ROOT/'media/song.mp3')
+    parser.add_argument('--audio', type=Path, help='Source audio; defaults to config.json')
     parser.add_argument('--output', type=Path, default=ROOT/'dist')
     args = parser.parse_args()
-    package = build(args.audio, args.output)
+    audio = args.audio
+    if audio is None:
+        audio = Path(json.loads((ROOT/'config.json').read_text(encoding='utf-8'))['audio']).expanduser()
+        if not audio.is_absolute():
+            audio = ROOT/audio
+    package = build(audio, args.output)
     suffix = 'windows' if sys.platform == 'win32' else 'macos'
     paths = [package, package.parent/f'world-execute-mv-{suffix}.zip']
     print(json.dumps({'artifacts': [str(p) for p in paths], 'embedded_audio': True}, ensure_ascii=False))

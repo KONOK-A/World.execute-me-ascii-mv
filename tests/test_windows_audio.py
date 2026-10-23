@@ -100,6 +100,25 @@ class WindowsAudioTests(unittest.TestCase):
         self.path.unlink()
         self.assertFalse(self.path.exists())
 
+    def test_stereo_pcm_keeps_fractional_duration_and_last_second(self):
+        frames = 216384
+        with wave.open(str(self.path), 'wb') as audio:
+            audio.setnchannels(2)
+            audio.setsampwidth(2)
+            audio.setframerate(44100)
+            audio.writeframes(b'\0'*(frames*4))
+        self.start()
+        duration = frames/44100
+        self.assertAlmostEqual(self.state()['duration'], duration, delta=1/44100)
+        self.command('volume 0')
+        self.command(f'seek {duration-.3}')
+        seeked = self.state(lambda s: s['time'] >= duration-.31)
+        self.assertFalse(seeked['playing'])
+        self.command('play')
+        self.state(lambda s: s['playing'] and s['time'] > duration-.2)
+        ended = self.state(lambda s: not s['playing'] and s['time'] >= duration-.01)
+        self.assertAlmostEqual(ended['time'], duration, delta=1/44100)
+
     def test_invalid_file_reports_error(self):
         sys.path.insert(0, str(ROOT))
         from player import Audio
