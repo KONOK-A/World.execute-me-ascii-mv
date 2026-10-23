@@ -6,7 +6,7 @@
 
 ## 使用方法
 
-1. 前往 [Releases](https://github.com/KONOK-A/world.execute-me-ascii-win/releases/latest)，下载 `world-execute-mv-windows.zip`。
+1. 获取 Windows 播放包 `world-execute-mv-windows.zip`。
 2. 完整解压，双击文件夹中的 `运行单文件.cmd`。
 3. 按空格开始播放。
 
@@ -32,5 +32,11 @@
 ```powershell
 .\run.cmd
 ```
+
+## 项目来源
+
+本项目基于 [yym8224961](https://github.com/yym8224961) 的 [world.execute-me-ascii](https://github.com/yym8224961/world.execute-me-ascii) 开发，现作为独立项目维护。
+
+原始字符 MV 由 yym8224961 创作。Windows 移植、播放与打包支持，以及后续动画、布局和音乐编排优化由 KANO（KONOK-A）完成。
 
 原曲与歌词：Mili《world.execute(me);》。相关版权归原权利人所有。
