@@ -113,6 +113,16 @@ class BundleTests(unittest.TestCase):
                 for name in ('ensure-runtime.ps1', 'python-runtime.json'):
                     self.assertEqual(archive.read('world-execute-mv/'+name), (ROOT/name).read_bytes())
 
+    def test_license_included_in_both_downloads(self):
+        license_text = (ROOT/'LICENSE').read_bytes()
+        with zipfile.ZipFile(self.bundle) as archive:
+            self.assertIn('LICENSE', archive.namelist())
+            self.assertEqual(archive.read('LICENSE'), license_text)
+        suffix = 'windows' if sys.platform == 'win32' else 'macos'
+        with zipfile.ZipFile(self.output/f'world-execute-mv-{suffix}.zip') as archive:
+            self.assertIn('world-execute-mv/LICENSE', archive.namelist())
+            self.assertEqual(archive.read('world-execute-mv/LICENSE'), license_text)
+
     @unittest.skipUnless(sys.platform == 'win32', 'Windows launcher')
     def test_distribution_launcher_runs_with_special_paths(self):
         with tempfile.TemporaryDirectory(prefix='mv 启动 (test); ') as folder:

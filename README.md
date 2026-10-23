@@ -6,7 +6,7 @@
 
 ## 使用方法
 
-1. 获取 Windows 播放包 `world-execute-mv-windows.zip`。
+1. 前往 [Releases](https://github.com/KONOK-A/World.execute-me-ascii-mv/releases/latest)，下载 `world-execute-mv-windows.zip`。
 2. 完整解压，双击文件夹中的 `运行单文件.cmd`。
 3. 按空格开始播放。
 

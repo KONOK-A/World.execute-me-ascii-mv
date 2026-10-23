@@ -12,7 +12,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ('player.py', 'scenes.py', 'terminal.py', 'music.py', 'render_output.py',
          'visuals.py', 'scenes_organic.py', 'scenes_learning.py',
-         'config.json', 'lyrics.json', 'spectrum.json', 'music_features.json', 'score.json')
+         'config.json', 'lyrics.json', 'spectrum.json', 'music_features.json', 'score.json', 'LICENSE')
 
 
 def build(audio, output):
@@ -54,6 +54,7 @@ def build(audio, output):
     distribution = output/('world-execute-mv-windows.zip' if windows else 'world-execute-mv-macos.zip')
     launcher = '运行单文件.cmd' if windows else '运行单文件.command'
     distribution_files = [('world-execute-mv.pyz', package), ('README.md', ROOT/'README.md'),
+                          ('LICENSE', ROOT/'LICENSE'),
                           (launcher, ROOT/launcher),
                           ('docs/images/mv-cover.png', ROOT/'docs/images/mv-cover.png')]
     if windows:
