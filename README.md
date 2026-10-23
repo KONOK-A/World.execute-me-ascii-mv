@@ -35,7 +35,7 @@
 
 ## 项目来源
 
-本项目基于 [yym8224961](https://github.com/yym8224961) 的 [world.execute-me-ascii](https://github.com/yym8224961/world.execute-me-ascii) 开发，现作为独立项目维护。
+本项目使用 [yym8224961](https://github.com/yym8224961) 在 [world.execute-me-ascii](https://github.com/yym8224961/world.execute-me-ascii) 中开源的创作提示词进行二次优化与开发，现作为独立项目维护。
 
 原始字符 MV 由 yym8224961 创作。Windows 移植、播放与打包支持，以及后续动画、布局和音乐编排优化由 KANO（KONOK-A）完成。
 
